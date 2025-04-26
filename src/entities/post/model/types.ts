@@ -9,6 +9,6 @@ export interface Post {
 }
 
 export interface Reaction {
-  like: number;
-  dislike: number;
+  likes: number;
+  dislikes: number;
 }
