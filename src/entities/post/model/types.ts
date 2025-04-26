@@ -1,4 +1,4 @@
-export type Post = {
+export interface Post {
   id: string;
   title: string;
   body: string;
@@ -6,9 +6,9 @@ export type Post = {
   reactions: Reaction;
   views: number;
   userId: number;
-};
+}
 
-type Reaction = {
+export interface Reaction {
   like: number;
   dislike: number;
-};
+}
