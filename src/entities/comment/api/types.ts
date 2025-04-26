@@ -6,7 +6,7 @@ export interface FetchCommentsResponse extends PaginationMeta {
 }
 
 export interface CreateCommentRequest {
-  body: string;
+  body: string | null;
   postId: number | null;
   userId: number;
 }

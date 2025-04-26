@@ -1,7 +1,7 @@
 export interface Comment {
   id: string;
   body: string;
-  postId: string;
+  postId: string | null;
   likes: number;
   user: {
     id: number;
