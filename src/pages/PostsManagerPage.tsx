@@ -15,10 +15,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
   Input,
   Select,
   SelectContent,
@@ -31,7 +27,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Textarea,
 } from '../shared/ui';
 import { Post } from '../entities/post/model/types';
 import { User, UserDetail } from '../entities/user/model/types';
@@ -43,6 +38,13 @@ import fetchUser from '../entities/user/api/fetchUser';
 import fetchPost from '../entities/post/api/fetchPost';
 import SelectTags from '../entities/tags/ui/SelectTags';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
+import { UserModal } from '../entities/user/ui/UserModal';
+import { AddPostDialog } from '../entities/post/ui/AddPostDialog';
+import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
+import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
+import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
+import { EditCommentDialog } from '../entities/comment/ui/EditCommentDialog';
+
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -453,69 +455,6 @@ const PostsManager = () => {
     </Table>
   );
 
-  // 댓글 렌더링
-  const renderComments = (postId: string) => (
-    <div className="mt-2">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold">댓글</h3>
-        <Button
-          size="sm"
-          onClick={() => {
-            // setNewComment((prev) => ({ ...prev, postId }));
-            setShowAddCommentDialog(true);
-          }}
-        >
-          <Plus className="w-3 h-3 mr-1" />
-          댓글 추가
-        </Button>
-      </div>
-      <div className="space-y-1">
-        {comments[postId]?.map((comment) => (
-          <div
-            key={comment.id}
-            className="flex items-center justify-between text-sm border-b pb-1"
-          >
-            <div className="flex items-center space-x-2 overflow-hidden">
-              <span className="font-medium truncate">
-                {comment.user.username}:
-              </span>
-              <span className="truncate">
-                {highlightText(comment.body, searchQuery)}
-              </span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => likeComment(comment.id, postId)}
-              >
-                <ThumbsUp className="w-3 h-3" />
-                <span className="ml-1 text-xs">{comment.likes}</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSelectedComment(comment);
-                  setShowEditCommentDialog(true);
-                }}
-              >
-                <Edit2 className="w-3 h-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteComment(comment.id, postId)}
-              >
-                <Trash2 className="w-3 h-3" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeader>
@@ -611,181 +550,63 @@ const PostsManager = () => {
       </CardContent>
 
       {/* 게시물 추가 대화상자 */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>새 게시물 추가</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="제목"
-              value={newPost.title}
-              onChange={(e) =>
-                setNewPost({ ...newPost, title: e.target.value })
-              }
-            />
-            <Textarea
-              rows={30}
-              placeholder="내용"
-              value={newPost.body}
-              onChange={(e) => setNewPost({ ...newPost, body: e.target.value })}
-            />
-            <Input
-              type="number"
-              placeholder="사용자 ID"
-              value={newPost.userId}
-              onChange={(e) =>
-                setNewPost({ ...newPost, userId: Number(e.target.value) })
-              }
-            />
-            <Button onClick={addPost}>게시물 추가</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AddPostDialog
+        isOpen={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        onAdd={addPost}
+        newPost={newPost}
+        setNewPost={setNewPost}
+      />
 
       {/* 게시물 수정 대화상자 */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>게시물 수정</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="제목"
-              value={selectedPost?.title || ''}
-              onChange={(e) =>
-                selectedPost &&
-                setSelectedPost({ ...selectedPost, title: e.target.value })
-              }
-            />
-            <Textarea
-              rows={15}
-              placeholder="내용"
-              value={selectedPost?.body || ''}
-              onChange={(e) =>
-                selectedPost &&
-                setSelectedPost({ ...selectedPost, body: e.target.value })
-              }
-            />
-            <Button onClick={updatePost}>게시물 업데이트</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* 댓글 추가 대화상자 */}
-      <Dialog
-        open={showAddCommentDialog}
-        onOpenChange={setShowAddCommentDialog}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>새 댓글 추가</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="댓글 내용"
-              value={newComment?.body || ''}
-              onChange={(e) =>
-                setNewComment((prev) => ({
-                  ...(prev || { postId: null, userId: 1 }),
-                  body: e.target.value,
-                }))
-              }
-            />
-            <Button onClick={addComment}>댓글 추가</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* 댓글 수정 대화상자 */}
-      <Dialog
-        open={showEditCommentDialog}
-        onOpenChange={setShowEditCommentDialog}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>댓글 수정</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="댓글 내용"
-              value={selectedComment?.body || ''}
-              onChange={(e) => {
-                setSelectedComment((prev) =>
-                  prev
-                    ? {
-                        ...prev,
-                        body: e.target.value,
-                      }
-                    : undefined,
-                );
-              }}
-            />
-            <Button onClick={updateComment}>댓글 업데이트</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditPostDialog
+        isOpen={showEditDialog}
+        onClose={() => setShowEditDialog(false)}
+        onUpdate={updatePost}
+        post={selectedPost}
+        setPost={setSelectedPost}
+      />
 
       {/* 게시물 상세 보기 대화상자 */}
-      <Dialog
-        open={showPostDetailDialog}
-        onOpenChange={setShowPostDetailDialog}
-      >
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>
-              {highlightText(selectedPost?.title || '', searchQuery)}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p>{highlightText(selectedPost?.body || '', searchQuery)}</p>
-            {renderComments(selectedPost?.id || '')}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PostDetailDialog
+        isOpen={showPostDetailDialog}
+        onClose={() => setShowPostDetailDialog(false)}
+        post={selectedPost}
+        searchQuery={searchQuery}
+        comments={comments[selectedPost?.id || ''] || []}
+        onAddComment={() => setShowAddCommentDialog(true)}
+        onEditComment={(comment) => {
+          setSelectedComment(comment);
+          setShowEditCommentDialog(true);
+        }}
+        onDeleteComment={(id) => deleteComment(id, selectedPost?.id || '')}
+        onLikeComment={(id) => likeComment(id, selectedPost?.id || '')}
+      />
+
+      {/* 댓글 추가 대화상자 */}
+      <AddCommentDialog
+        isOpen={showAddCommentDialog}
+        onClose={() => setShowAddCommentDialog(false)}
+        onAdd={addComment}
+        comment={newComment}
+        setComment={setNewComment}
+      />
+
+      {/* 댓글 수정 대화상자 */}
+      <EditCommentDialog
+        isOpen={showEditCommentDialog}
+        onClose={() => setShowEditCommentDialog(false)}
+        onUpdate={updateComment}
+        comment={selectedComment}
+        setComment={setSelectedComment}
+      />
 
       {/* 사용자 모달 */}
-      <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>사용자 정보</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <img
-              src={selectedUserDetail?.image}
-              alt={selectedUserDetail?.username}
-              className="w-24 h-24 rounded-full mx-auto"
-            />
-            <h3 className="text-xl font-semibold text-center">
-              {selectedUserDetail?.username}
-            </h3>
-            <div className="space-y-2">
-              <p>
-                <strong>이름:</strong> {selectedUserDetail?.firstName}{' '}
-                {selectedUserDetail?.lastName}
-              </p>
-              <p>
-                <strong>나이:</strong> {selectedUserDetail?.age}
-              </p>
-              <p>
-                <strong>이메일:</strong> {selectedUserDetail?.email}
-              </p>
-              <p>
-                <strong>전화번호:</strong> {selectedUserDetail?.phone}
-              </p>
-              <p>
-                <strong>주소:</strong> {selectedUserDetail?.address?.address},{' '}
-                {selectedUserDetail?.address?.city},{' '}
-                {selectedUserDetail?.address?.state}
-              </p>
-              <p>
-                <strong>직장:</strong> {selectedUserDetail?.company?.name} -{' '}
-                {selectedUserDetail?.company?.title}
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <UserModal
+        isOpen={showUserModal}
+        onClose={() => setShowUserModal(false)}
+        userDetail={selectedUserDetail}
+      />
     </Card>
   );
 };
