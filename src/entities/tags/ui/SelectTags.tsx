@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import fetchTag from '../api/fetchTag';
-import { Tag } from '../model';
 import {
   Select,
   SelectContent,
@@ -8,19 +5,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../shared/ui/Select';
+import { useTag } from '../hooks/useTag';
 
 interface SelectTagsProps {
   selectedTag: string;
   setSelectedTag: (tag: string) => void;
 }
 const SelectTags = ({ selectedTag, setSelectedTag }: SelectTagsProps) => {
-  const [tags, setTags] = useState<Tag[]>([]);
-
-  useEffect(() => {
-    fetchTag().then((tags) => {
-      setTags(tags);
-    });
-  }, []);
+  const { data: tags } = useTag();
 
   return (
     <Select value={selectedTag} onValueChange={setSelectedTag}>
@@ -29,7 +21,7 @@ const SelectTags = ({ selectedTag, setSelectedTag }: SelectTagsProps) => {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">모든 태그</SelectItem>
-        {tags.map((tag) => (
+        {tags?.map((tag) => (
           <SelectItem key={tag.url} value={tag.slug}>
             {tag.slug}
           </SelectItem>
