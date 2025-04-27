@@ -34,13 +34,14 @@ import {
   Textarea,
 } from '../shared/ui';
 import { Post } from '../entities/post/model/types';
-import { FetchPostsResponse } from '../entities/post/api/types';
 import { User, UserDetail } from '../entities/user/model/types';
 import { Comment } from '../entities/comment/model/types';
 import { CreateCommentRequest } from '../entities/comment/api/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import { PostWithUser } from '../feature/postsWithUser/model/types';
-import { Tag } from '../entities/tags/model';
+import fetchUser from '../entities/user/api/fetchUser';
+import fetchPost from '../entities/post/api/fetchPost';
+import SelectTags from '../entities/tags/ui/SelectTags';
 
 const PostsManager = () => {
   const navigate = useNavigate();
@@ -66,7 +67,6 @@ const PostsManager = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', body: '', userId: 1 });
   const [loading, setLoading] = useState(false);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTag, setSelectedTag] = useState(queryParams.get('tag') || '');
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [selectedComment, setSelectedComment] = useState<Comment>();
@@ -92,38 +92,21 @@ const PostsManager = () => {
   // 게시물 가져오기
   const fetchPosts = () => {
     setLoading(true);
-    let postsData: FetchPostsResponse;
-    let usersData: User[];
-
-    fetch(`/api/posts?limit=${limit}&skip=${skip}`)
-      .then((response) => response.json())
-      .then((data) => {
-        postsData = data;
-        return fetch('/api/users?limit=0&select=username,image');
-      })
-      .then((response) => response.json())
-      .then((users) => {
-        usersData = users.users;
-        const postsWithUsers = createPostsWithUsers(postsData.posts, usersData);
-        setPosts(postsWithUsers);
-        setTotal(postsData.total);
-      })
-      .catch((error) => {
-        console.error('게시물 가져오기 오류:', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  // 태그 가져오기
-  const fetchTags = async () => {
     try {
-      const response = await fetch('/api/posts/tags');
-      const data = await response.json();
-      setTags(data);
+      Promise.all([fetchPost(limit, skip), fetchUser()]).then(
+        ([postsData, usersData]) => {
+          const postsWithUsers = createPostsWithUsers(
+            postsData.posts,
+            usersData.users,
+          );
+          setPosts(postsWithUsers);
+          setTotal(postsData.total);
+        },
+      );
     } catch (error) {
-      console.error('태그 가져오기 오류:', error);
+      console.error('게시물 가져오기 오류:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -331,10 +314,6 @@ const PostsManager = () => {
   };
 
   useEffect(() => {
-    fetchTags();
-  }, []);
-
-  useEffect(() => {
     if (selectedTag) {
       fetchPostsByTag(selectedTag);
     } else {
@@ -372,6 +351,12 @@ const PostsManager = () => {
         )}
       </span>
     );
+  };
+
+  const handleTagChange = (tag: string) => {
+    setSelectedTag(tag);
+    fetchPostsByTag(tag);
+    updateURL();
   };
 
   // 게시물 테이블 렌더링
@@ -559,26 +544,10 @@ const PostsManager = () => {
                 />
               </div>
             </div>
-            <Select
-              value={selectedTag}
-              onValueChange={(value) => {
-                setSelectedTag(value);
-                fetchPostsByTag(value);
-                updateURL();
-              }}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="태그 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">모든 태그</SelectItem>
-                {tags.map((tag) => (
-                  <SelectItem key={tag.url} value={tag.slug}>
-                    {tag.slug}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SelectTags
+              selectedTag={selectedTag}
+              setSelectedTag={handleTagChange}
+            />
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="정렬 기준" />
