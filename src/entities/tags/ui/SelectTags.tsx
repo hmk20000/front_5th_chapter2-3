@@ -6,16 +6,22 @@ import {
   SelectValue,
 } from '../../../shared/ui/Select';
 import { useTag } from '../hooks/useTag';
+import useSelectedTags from '../../../feature/selectTags/hooks/useSelectedTags';
 
 interface SelectTagsProps {
-  selectedTag: string;
-  setSelectedTag: (tag: string) => void;
+  onTagChange: (tag: string) => void;
 }
-const SelectTags = ({ selectedTag, setSelectedTag }: SelectTagsProps) => {
+const SelectTags = ({ onTagChange }: SelectTagsProps) => {
   const { data: tags } = useTag();
+  const { selectedTag, setSelectedTag } = useSelectedTags();
+
+  const handleTagChange = (tag: string) => {
+    setSelectedTag(tag);
+    onTagChange(tag);
+  };
 
   return (
-    <Select value={selectedTag} onValueChange={setSelectedTag}>
+    <Select value={selectedTag} onValueChange={handleTagChange}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="태그 선택" />
       </SelectTrigger>

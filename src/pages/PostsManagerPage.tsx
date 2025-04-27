@@ -42,7 +42,7 @@ import { PostWithUser } from '../feature/postsWithUser/model/types';
 import fetchUser from '../entities/user/api/fetchUser';
 import fetchPost from '../entities/post/api/fetchPost';
 import SelectTags from '../entities/tags/ui/SelectTags';
-
+import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,7 +67,6 @@ const PostsManager = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', body: '', userId: 1 });
   const [loading, setLoading] = useState(false);
-  const [selectedTag, setSelectedTag] = useState(queryParams.get('tag') || '');
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [selectedComment, setSelectedComment] = useState<Comment>();
   const [newComment, setNewComment] = useState<CreateCommentRequest>();
@@ -76,6 +75,7 @@ const PostsManager = () => {
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUserDetail, setSelectedUserDetail] = useState<UserDetail>();
+  const { selectedTag, setSelectedTag } = useSelectedTags();
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -354,7 +354,6 @@ const PostsManager = () => {
   };
 
   const handleTagChange = (tag: string) => {
-    setSelectedTag(tag);
     fetchPostsByTag(tag);
     updateURL();
   };
@@ -544,10 +543,7 @@ const PostsManager = () => {
                 />
               </div>
             </div>
-            <SelectTags
-              selectedTag={selectedTag}
-              setSelectedTag={handleTagChange}
-            />
+            <SelectTags onTagChange={handleTagChange} />
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="정렬 기준" />
