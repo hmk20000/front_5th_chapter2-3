@@ -2,6 +2,14 @@ import { TableRow, TableCell } from '../../shared/ui/Table';
 import { Post } from '../../entities/post/model/types';
 import { User } from '../../entities/user/model/types';
 import { PostWithUser } from '../postsWithUser/model/types';
+import { Button } from '../../shared/ui/Button';
+import {
+  MessageSquare,
+  ThumbsDown,
+  ThumbsUp,
+  Edit2,
+  Trash2,
+} from 'lucide-react';
 interface PostTableRowProps {
   post: PostWithUser;
   searchQuery: string;
@@ -13,12 +21,6 @@ interface PostTableRowProps {
   setSelectedPost: (post: Post) => void;
   setShowEditDialog: (show: boolean) => void;
   updateURL: () => void;
-  ThumbsUp: React.ElementType;
-  ThumbsDown: React.ElementType;
-  MessageSquare: React.ElementType;
-  Edit2: React.ElementType;
-  Trash2: React.ElementType;
-  Button: React.ElementType;
 }
 const PostTableRow = ({
   post,
@@ -31,12 +33,6 @@ const PostTableRow = ({
   setSelectedPost,
   setShowEditDialog,
   updateURL,
-  ThumbsUp,
-  ThumbsDown,
-  MessageSquare,
-  Edit2,
-  Trash2,
-  Button,
 }: PostTableRowProps) => {
   // 하이라이트 함수 추가
   const highlightText = (text: string, highlight: string) => {

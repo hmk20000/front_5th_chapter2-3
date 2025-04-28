@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  Edit2,
-  MessageSquare,
-  ThumbsDown,
-  ThumbsUp,
-  Trash2,
-} from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent } from '../shared/ui';
+import { Card, CardContent } from '../shared/ui';
 import { Post } from '../entities/post/model/types';
 import { User, UserDetail } from '../entities/user/model/types';
 import { Comment } from '../entities/comment/model/types';
@@ -321,33 +314,6 @@ const PostsManager = () => {
     updateURL();
   };
 
-  // 게시물 테이블 렌더링
-  const renderPostTable = () => (
-    <PostTableLayout>
-      {posts.map((post) => (
-        <PostTableRow
-          key={post.id}
-          post={post}
-          searchQuery={searchQuery}
-          selectedTag={selectedTag}
-          setSelectedTag={setSelectedTag}
-          openUserModal={openUserModal}
-          openPostDetail={openPostDetail}
-          deletePost={deletePost}
-          setSelectedPost={setSelectedPost}
-          setShowEditDialog={setShowEditDialog}
-          updateURL={updateURL}
-          ThumbsUp={ThumbsUp}
-          ThumbsDown={ThumbsDown}
-          MessageSquare={MessageSquare}
-          Edit2={Edit2}
-          Trash2={Trash2}
-          Button={Button}
-        />
-      ))}
-    </PostTableLayout>
-  );
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeaderLayout setShowAddDialog={setShowAddDialog} />
@@ -369,7 +335,23 @@ const PostsManager = () => {
           {loading ? (
             <div className="flex justify-center p-4">로딩 중...</div>
           ) : (
-            renderPostTable()
+            <PostTableLayout>
+              {posts.map((post) => (
+                <PostTableRow
+                  key={post.id}
+                  post={post}
+                  searchQuery={searchQuery}
+                  selectedTag={selectedTag}
+                  setSelectedTag={setSelectedTag}
+                  openUserModal={openUserModal}
+                  openPostDetail={openPostDetail}
+                  deletePost={deletePost}
+                  setSelectedPost={setSelectedPost}
+                  setShowEditDialog={setShowEditDialog}
+                  updateURL={updateURL}
+                />
+              ))}
+            </PostTableLayout>
           )}
 
           {/* 페이지네이션 */}
