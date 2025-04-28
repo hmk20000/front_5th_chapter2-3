@@ -46,7 +46,7 @@ const PostsManager = () => {
   // 상태 관리
   const [posts, setPosts] = useState<PostWithUser[]>([]);
   const [total, setTotal] = useState(0);
-  const [skip, setSkip] = useState(parseInt(queryParams.get('skip') || '0'));
+  // const [skip, setSkip] = useState(parseInt(queryParams.get('skip') || '0'));
   const [searchQuery, setSearchQuery] = useState(
     queryParams.get('search') || '',
   );
@@ -69,13 +69,13 @@ const PostsManager = () => {
   const [selectedUserDetail, setSelectedUserDetail] = useState<UserDetail>();
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
-  const { limit } = usePaginationStore();
+  const { limit, skip } = usePaginationStore();
 
   // URL 업데이트 함수
   const updateURL = () => {
     const params = new URLSearchParams();
-    if (skip) params.set('skip', skip.toString());
-    // if (limit) params.set('limit', limit.toString());
+    // if (skip) params.set('skip', skip.toString());
+    if (limit) params.set('limit', limit.toString());
     if (searchQuery) params.set('search', searchQuery);
     if (sortBy) params.set('sortBy', sortBy);
     if (sortOrder) params.set('sortOrder', sortOrder);
@@ -318,7 +318,7 @@ const PostsManager = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    setSkip(parseInt(params.get('skip') || '0'));
+    // setSkip(parseInt(params.get('skip') || '0'));
     // setLimit(parseInt(params.get('limit') || '10'));
     setSearchQuery(params.get('search') || '');
     setSortBy(params.get('sortBy') || '');
@@ -472,7 +472,7 @@ const PostsManager = () => {
           )}
 
           {/* 페이지네이션 */}
-          <PaginationLayout skip={skip} setSkip={setSkip} total={total} />
+          <PaginationLayout total={total} />
         </div>
       </CardContent>
 
