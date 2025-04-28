@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import {
   Edit2,
   MessageSquare,
-  Plus,
   Search,
   ThumbsDown,
   ThumbsUp,
@@ -13,8 +12,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   Input,
   Select,
   SelectContent,
@@ -44,7 +41,7 @@ import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
 import { EditCommentDialog } from '../entities/comment/ui/EditCommentDialog';
-
+import CardHeaderLayout from '../widgets/card/ui/CardHeader';
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -457,15 +454,7 @@ const PostsManager = () => {
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>게시물 관리자</span>
-          <Button onClick={() => setShowAddDialog(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            게시물 추가
-          </Button>
-        </CardTitle>
-      </CardHeader>
+      <CardHeaderLayout setShowAddDialog={setShowAddDialog} />
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
