@@ -3,13 +3,7 @@ import { Post } from '../../entities/post/model/types';
 import { User } from '../../entities/user/model/types';
 import { PostWithUser } from '../postsWithUser/model/types';
 import { Button } from '../../shared/ui/Button';
-import {
-  MessageSquare,
-  ThumbsDown,
-  ThumbsUp,
-  Edit2,
-  Trash2,
-} from 'lucide-react';
+import { MessageSquare, ThumbsDown, ThumbsUp, Edit2 } from 'lucide-react';
 interface PostTableRowProps {
   post: PostWithUser;
   searchQuery: string;
@@ -17,7 +11,6 @@ interface PostTableRowProps {
   setSelectedTag: (tag: string) => void;
   openUserModal: (user: User) => void;
   openPostDetail: (post: Post) => void;
-  deletePost: (id: string) => void;
   setSelectedPost: (post: Post) => void;
   setShowEditDialog: (show: boolean) => void;
   updateURL: () => void;
@@ -29,7 +22,6 @@ const PostTableRow = ({
   setSelectedTag,
   openUserModal,
   openPostDetail,
-  deletePost,
   setSelectedPost,
   setShowEditDialog,
   updateURL,
@@ -120,9 +112,6 @@ const PostTableRow = ({
             }}
           >
             <Edit2 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => deletePost(post.id)}>
-            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </TableCell>

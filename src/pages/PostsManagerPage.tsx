@@ -165,18 +165,6 @@ const PostsManager = () => {
     }
   };
 
-  // 게시물 삭제
-  const deletePost = async (id: string) => {
-    try {
-      await fetch(`/api/posts/${id}`, {
-        method: 'DELETE',
-      });
-      setPosts(posts.filter((post) => post.id !== id));
-    } catch (error) {
-      console.error('게시물 삭제 오류:', error);
-    }
-  };
-
   // 댓글 가져오기
   const fetchComments = async (postId: string) => {
     if (comments[postId]) return; // 이미 불러온 댓글이 있으면 다시 불러오지 않음
@@ -344,7 +332,6 @@ const PostsManager = () => {
                   setSelectedTag={setSelectedTag}
                   openUserModal={openUserModal}
                   openPostDetail={openPostDetail}
-                  deletePost={deletePost}
                   setSelectedPost={setSelectedPost}
                   setShowEditDialog={setShowEditDialog}
                   updateURL={updateURL}
