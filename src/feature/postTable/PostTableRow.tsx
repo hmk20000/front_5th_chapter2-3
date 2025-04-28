@@ -4,6 +4,7 @@ import { User } from '../../entities/user/model/types';
 import { PostWithUser } from '../postsWithUser/model/types';
 import { Button } from '../../shared/ui/Button';
 import { MessageSquare, ThumbsDown, ThumbsUp, Edit2 } from 'lucide-react';
+import DeletePostButton from '../deletePost/ui/DeletePostButton';
 interface PostTableRowProps {
   post: PostWithUser;
   searchQuery: string;
@@ -113,6 +114,7 @@ const PostTableRow = ({
           >
             <Edit2 className="w-4 h-4" />
           </Button>
+          <DeletePostButton postId={post.id} />
         </div>
       </TableCell>
     </TableRow>

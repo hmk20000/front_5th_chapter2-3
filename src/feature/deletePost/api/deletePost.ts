@@ -5,7 +5,6 @@ const deletePost = async (id: string) => {
       method: 'DELETE',
     });
     return response.json();
-    // setPosts(posts.filter((post) => post.id !== id));
   } catch (error) {
     console.error('게시물 삭제 오류:', error);
   }
