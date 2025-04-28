@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import {
   Edit2,
   MessageSquare,
-  Search,
   ThumbsDown,
   ThumbsUp,
   Trash2,
@@ -12,7 +11,6 @@ import {
   Button,
   Card,
   CardContent,
-  Input,
   Select,
   SelectContent,
   SelectItem,
@@ -33,7 +31,6 @@ import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import { PostWithUser } from '../feature/postsWithUser/model/types';
 import fetchUser from '../entities/user/api/fetchUser';
 import fetchPost from '../entities/post/api/fetchPost';
-import SelectTags from '../entities/tags/ui/SelectTags';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
 import { UserModal } from '../entities/user/ui/UserModal';
 import { AddPostDialog } from '../entities/post/ui/AddPostDialog';
@@ -41,7 +38,9 @@ import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
 import { EditCommentDialog } from '../entities/comment/ui/EditCommentDialog';
-import CardHeaderLayout from '../widgets/card/ui/CardHeader';
+import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
+import FilterLayout from '../widgets/filter/ui/FilterLayout';
+
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -458,41 +457,16 @@ const PostsManager = () => {
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="게시물 검색..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && searchPosts()}
-                />
-              </div>
-            </div>
-            <SelectTags onTagChange={handleTagChange} />
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="정렬 기준" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">없음</SelectItem>
-                <SelectItem value="id">ID</SelectItem>
-                <SelectItem value="title">제목</SelectItem>
-                <SelectItem value="reactions">반응</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="정렬 순서" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="asc">오름차순</SelectItem>
-                <SelectItem value="desc">내림차순</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <FilterLayout
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            searchPosts={searchPosts}
+            handleTagChange={handleTagChange}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+          />
 
           {/* 게시물 테이블 */}
           {loading ? (
