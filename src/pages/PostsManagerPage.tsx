@@ -6,7 +6,6 @@ import { User, UserDetail } from '../entities/user/model/types';
 import { Comment } from '../entities/comment/model/types';
 import { CreateCommentRequest } from '../entities/comment/api/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
-import { PostWithUser } from '../feature/postsWithUser/model/types';
 import fetchUser from '../entities/user/api/fetchUser';
 import fetchPost from '../entities/post/api/fetchPost';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
@@ -22,14 +21,13 @@ import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
 import usePaginationStore from '../feature/pagination/model/store';
 import PostTableLayout from '../widgets/table/ui/PostTableLayout';
 import PostTableRow from '../feature/postTable/PostTableRow';
-
+import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
   // 상태 관리
-  const [posts, setPosts] = useState<PostWithUser[]>([]);
   const [searchQuery, setSearchQuery] = useState(
     queryParams.get('search') || '',
   );
@@ -53,6 +51,7 @@ const PostsManager = () => {
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
   const { limit, skip, setTotal } = usePaginationStore();
+  const { posts, setPosts } = usePostsWithUserStore();
 
   // URL 업데이트 함수
   const updateURL = () => {
