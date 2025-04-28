@@ -45,8 +45,6 @@ const PostsManager = () => {
 
   // 상태 관리
   const [posts, setPosts] = useState<PostWithUser[]>([]);
-  const [total, setTotal] = useState(0);
-  // const [skip, setSkip] = useState(parseInt(queryParams.get('skip') || '0'));
   const [searchQuery, setSearchQuery] = useState(
     queryParams.get('search') || '',
   );
@@ -69,7 +67,7 @@ const PostsManager = () => {
   const [selectedUserDetail, setSelectedUserDetail] = useState<UserDetail>();
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
-  const { limit, skip } = usePaginationStore();
+  const { limit, skip, setTotal } = usePaginationStore();
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -472,7 +470,7 @@ const PostsManager = () => {
           )}
 
           {/* 페이지네이션 */}
-          <PaginationLayout total={total} />
+          <PaginationLayout />
         </div>
       </CardContent>
 
