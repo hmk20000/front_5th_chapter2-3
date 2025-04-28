@@ -36,6 +36,8 @@ import { EditCommentDialog } from '../entities/comment/ui/EditCommentDialog';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
 import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
+import usePaginationStore from '../feature/pagination/model/store';
+
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,9 +47,6 @@ const PostsManager = () => {
   const [posts, setPosts] = useState<PostWithUser[]>([]);
   const [total, setTotal] = useState(0);
   const [skip, setSkip] = useState(parseInt(queryParams.get('skip') || '0'));
-  const [limit, setLimit] = useState(
-    parseInt(queryParams.get('limit') || '10'),
-  );
   const [searchQuery, setSearchQuery] = useState(
     queryParams.get('search') || '',
   );
@@ -70,11 +69,13 @@ const PostsManager = () => {
   const [selectedUserDetail, setSelectedUserDetail] = useState<UserDetail>();
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
+  const { limit } = usePaginationStore();
+
   // URL 업데이트 함수
   const updateURL = () => {
     const params = new URLSearchParams();
     if (skip) params.set('skip', skip.toString());
-    if (limit) params.set('limit', limit.toString());
+    // if (limit) params.set('limit', limit.toString());
     if (searchQuery) params.set('search', searchQuery);
     if (sortBy) params.set('sortBy', sortBy);
     if (sortOrder) params.set('sortOrder', sortOrder);
@@ -318,7 +319,7 @@ const PostsManager = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setSkip(parseInt(params.get('skip') || '0'));
-    setLimit(parseInt(params.get('limit') || '10'));
+    // setLimit(parseInt(params.get('limit') || '10'));
     setSearchQuery(params.get('search') || '');
     setSortBy(params.get('sortBy') || '');
     setSortOrder(params.get('sortOrder') || 'asc');
@@ -471,13 +472,7 @@ const PostsManager = () => {
           )}
 
           {/* 페이지네이션 */}
-          <PaginationLayout
-            limit={limit}
-            setLimit={setLimit}
-            skip={skip}
-            setSkip={setSkip}
-            total={total}
-          />
+          <PaginationLayout skip={skip} setSkip={setSkip} total={total} />
         </div>
       </CardContent>
 
