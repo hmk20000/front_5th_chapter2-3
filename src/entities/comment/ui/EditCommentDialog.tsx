@@ -8,13 +8,13 @@ import {
 } from '../../../shared/ui';
 import { Comment } from '../model/types';
 
-interface EditCommentDialogProps {
+type EditCommentDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: () => void;
+  onUpdate: (comment: Comment) => Promise<void>;
   comment: Comment | undefined;
   setComment: (comment: Comment) => void;
-}
+};
 
 export const EditCommentDialog = ({
   isOpen,
@@ -37,7 +37,7 @@ export const EditCommentDialog = ({
             value={comment.body}
             onChange={(e) => setComment({ ...comment, body: e.target.value })}
           />
-          <Button onClick={onUpdate}>댓글 업데이트</Button>
+          <Button onClick={() => onUpdate(comment)}>댓글 업데이트</Button>
         </div>
       </DialogContent>
     </Dialog>

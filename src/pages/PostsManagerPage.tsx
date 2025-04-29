@@ -13,7 +13,6 @@ import { AddPostDialog } from '../entities/post/ui/AddPostDialog';
 import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
-import { EditCommentDialog } from '../entities/comment/ui/EditCommentDialog';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
 import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
@@ -23,6 +22,8 @@ import PostTableRow from '../feature/postTable/PostTableRow';
 import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 
 import useUserModal from '../entities/user/hooks/useUserModal';
+import useEditCommentModal from '../entities/comment/hooks/useEditCommentModal';
+
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,10 +43,8 @@ const PostsManager = () => {
   const [newPost, setNewPost] = useState({ title: '', body: '', userId: 1 });
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
-  const [selectedComment, setSelectedComment] = useState<Comment>();
   const [newComment, setNewComment] = useState<CreateCommentRequest>();
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false);
-  const [showEditCommentDialog, setShowEditCommentDialog] = useState(false);
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
@@ -53,6 +52,12 @@ const PostsManager = () => {
   const { posts, setPosts } = usePostsWithUserStore();
 
   const { openUserModal, UserModal } = useUserModal();
+  const {
+    openEditCommentModal,
+    EditCommentModal,
+    state,
+    closeEditCommentModal,
+  } = useEditCommentModal();
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -201,10 +206,10 @@ const PostsManager = () => {
   // 댓글 업데이트
   const updateComment = async () => {
     try {
-      const response = await fetch(`/api/comments/${selectedComment?.id}`, {
+      const response = await fetch(`/api/comments/${state.comment?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: selectedComment?.body }),
+        body: JSON.stringify({ body: state.comment?.body }),
       });
       const data = await response.json();
       setComments((prev) => ({
@@ -213,7 +218,7 @@ const PostsManager = () => {
           comment.id === data.id ? data : comment,
         ),
       }));
-      setShowEditCommentDialog(false);
+      closeEditCommentModal();
     } catch (error) {
       console.error('댓글 업데이트 오류:', error);
     }
@@ -266,17 +271,6 @@ const PostsManager = () => {
     setShowPostDetailDialog(true);
   };
 
-  // 사용자 모달 열기
-  // const openUserModal = async (user: User) => {
-  //   try {
-  //     const userData = await fetchUser(user.id);
-  //     setSelectedUserDetail(userData);
-  //     setShowUserModal(true);
-  //   } catch (error) {
-  //     console.error('사용자 정보 가져오기 오류:', error);
-  //   }
-  // };
-
   useEffect(() => {
     if (selectedTag) {
       fetchPostsByTag(selectedTag);
@@ -299,6 +293,10 @@ const PostsManager = () => {
   const handleTagChange = (tag: string) => {
     fetchPostsByTag(tag);
     updateURL();
+  };
+
+  const handleEditComment = (comment: Comment) => {
+    openEditCommentModal(comment);
   };
 
   return (
@@ -371,10 +369,7 @@ const PostsManager = () => {
         searchQuery={searchQuery}
         comments={comments[selectedPost?.id || ''] || []}
         onAddComment={() => setShowAddCommentDialog(true)}
-        onEditComment={(comment) => {
-          setSelectedComment(comment);
-          setShowEditCommentDialog(true);
-        }}
+        onEditComment={handleEditComment}
         onDeleteComment={(id) => deleteComment(id, selectedPost?.id || '')}
         onLikeComment={(id) => likeComment(id, selectedPost?.id || '')}
       />
@@ -389,13 +384,7 @@ const PostsManager = () => {
       />
 
       {/* 댓글 수정 대화상자 */}
-      <EditCommentDialog
-        isOpen={showEditCommentDialog}
-        onClose={() => setShowEditCommentDialog(false)}
-        onUpdate={updateComment}
-        comment={selectedComment}
-        setComment={setSelectedComment}
-      />
+      <EditCommentModal onUpdate={updateComment} />
 
       <UserModal />
     </Card>
