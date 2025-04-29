@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../shared/ui';
 import { Post } from '../entities/post/model/types';
-import { User, UserDetail } from '../entities/user/model/types';
 import { Comment } from '../entities/comment/model/types';
 import { CreateCommentRequest } from '../entities/comment/api/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
-import { UserModal } from '../entities/user/ui/UserModal';
+
 import { AddPostDialog } from '../entities/post/ui/AddPostDialog';
 import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
@@ -22,6 +21,8 @@ import usePaginationStore from '../feature/pagination/model/store';
 import PostTableLayout from '../widgets/table/ui/PostTableLayout';
 import PostTableRow from '../feature/postTable/PostTableRow';
 import usePostsWithUserStore from '../feature/postsWithUser/model/store';
+
+import useUserModal from '../entities/user/hooks/useUserModal';
 const PostsManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,12 +47,12 @@ const PostsManager = () => {
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false);
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false);
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [selectedUserDetail, setSelectedUserDetail] = useState<UserDetail>();
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
   const { limit, skip, setTotal } = usePaginationStore();
   const { posts, setPosts } = usePostsWithUserStore();
+
+  const { openUserModal, UserModal } = useUserModal();
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -266,16 +267,15 @@ const PostsManager = () => {
   };
 
   // 사용자 모달 열기
-  const openUserModal = async (user: User) => {
-    try {
-      const response = await fetch(`/api/users/${user.id}`);
-      const userData: UserDetail = await response.json();
-      setSelectedUserDetail(userData);
-      setShowUserModal(true);
-    } catch (error) {
-      console.error('사용자 정보 가져오기 오류:', error);
-    }
-  };
+  // const openUserModal = async (user: User) => {
+  //   try {
+  //     const userData = await fetchUser(user.id);
+  //     setSelectedUserDetail(userData);
+  //     setShowUserModal(true);
+  //   } catch (error) {
+  //     console.error('사용자 정보 가져오기 오류:', error);
+  //   }
+  // };
 
   useEffect(() => {
     if (selectedTag) {
@@ -397,12 +397,7 @@ const PostsManager = () => {
         setComment={setSelectedComment}
       />
 
-      {/* 사용자 모달 */}
-      <UserModal
-        isOpen={showUserModal}
-        onClose={() => setShowUserModal(false)}
-        userDetail={selectedUserDetail}
-      />
+      <UserModal />
     </Card>
   );
 };
