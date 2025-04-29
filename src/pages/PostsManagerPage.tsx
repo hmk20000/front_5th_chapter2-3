@@ -6,7 +6,7 @@ import { User, UserDetail } from '../entities/user/model/types';
 import { Comment } from '../entities/comment/model/types';
 import { CreateCommentRequest } from '../entities/comment/api/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
-import fetchUser from '../entities/user/api/fetchUser';
+import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
 import { UserModal } from '../entities/user/ui/UserModal';
@@ -69,7 +69,7 @@ const PostsManager = () => {
   const fetchPosts = () => {
     setLoading(true);
     try {
-      Promise.all([fetchPost(limit, skip), fetchUser()]).then(
+      Promise.all([fetchPost(limit, skip), fetchUsers()]).then(
         ([postsData, usersData]) => {
           const postsWithUsers = createPostsWithUsers(
             postsData.posts,
