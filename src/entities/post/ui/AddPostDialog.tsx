@@ -7,17 +7,13 @@ import {
   Input,
   Textarea,
 } from '../../../shared/ui';
-
+import { PostDTO } from '../model/types';
 interface AddPostDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: () => void;
-  newPost: {
-    title: string;
-    body: string;
-    userId: number;
-  };
-  setNewPost: (post: { title: string; body: string; userId: number }) => void;
+  newPost: PostDTO;
+  setNewPost: (post: PostDTO) => void;
 }
 
 export const AddPostDialog = ({

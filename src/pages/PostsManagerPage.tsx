@@ -9,7 +9,6 @@ import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
 
-import { AddPostDialog } from '../entities/post/ui/AddPostDialog';
 import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
@@ -33,14 +32,11 @@ const PostsManager = () => {
   const [searchQuery, setSearchQuery] = useState(
     queryParams.get('search') || '',
   );
-  // const [selectedPost, setSelectedPost] = useState<Post>();
   const [sortBy, setSortBy] = useState(queryParams.get('sortBy') || '');
   const [sortOrder, setSortOrder] = useState(
     queryParams.get('sortOrder') || 'asc',
   );
-  const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [newPost, setNewPost] = useState({ title: '', body: '', userId: 1 });
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [newComment, setNewComment] = useState<CreateCommentRequest>();
@@ -137,23 +133,6 @@ const PostsManager = () => {
       console.error('태그별 게시물 가져오기 오류:', error);
     }
     setLoading(false);
-  };
-
-  // 게시물 추가
-  const addPost = async () => {
-    try {
-      const response = await fetch('/api/posts/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPost),
-      });
-      const data = await response.json();
-      setPosts([data, ...posts]);
-      setShowAddDialog(false);
-      setNewPost({ title: '', body: '', userId: 1 });
-    } catch (error) {
-      console.error('게시물 추가 오류:', error);
-    }
   };
 
   // 게시물 업데이트
@@ -303,7 +282,7 @@ const PostsManager = () => {
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
-      <CardHeaderLayout setShowAddDialog={setShowAddDialog} />
+      <CardHeaderLayout />
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
@@ -343,15 +322,6 @@ const PostsManager = () => {
           <PaginationLayout />
         </div>
       </CardContent>
-
-      {/* 게시물 추가 대화상자 */}
-      <AddPostDialog
-        isOpen={showAddDialog}
-        onClose={() => setShowAddDialog(false)}
-        onAdd={addPost}
-        newPost={newPost}
-        setNewPost={setNewPost}
-      />
 
       {/* 게시물 수정 대화상자 */}
       <EditPostDialog

@@ -1,10 +1,13 @@
-export interface Post {
+export interface Post extends PostDTO {
   id: string;
-  title: string;
-  body: string;
   tags: string[];
   reactions: Reaction;
   views: number;
+}
+
+export interface PostDTO {
+  title: string;
+  body: string;
   userId: number;
 }
 
