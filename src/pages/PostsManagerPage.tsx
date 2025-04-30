@@ -20,9 +20,9 @@ import usePaginationStore from '../feature/pagination/model/store';
 import PostTableLayout from '../widgets/table/ui/PostTableLayout';
 import PostTableRow from '../feature/postTable/PostTableRow';
 import usePostsWithUserStore from '../feature/postsWithUser/model/store';
-
 import useUserModal from '../entities/user/hooks/useUserModal';
 import useEditCommentModal from '../entities/comment/hooks/useEditCommentModal';
+import { useSelectedPostStore } from '../feature/postDetail/model/store';
 
 const PostsManager = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const PostsManager = () => {
   const [searchQuery, setSearchQuery] = useState(
     queryParams.get('search') || '',
   );
-  const [selectedPost, setSelectedPost] = useState<Post>();
+  // const [selectedPost, setSelectedPost] = useState<Post>();
   const [sortBy, setSortBy] = useState(queryParams.get('sortBy') || '');
   const [sortOrder, setSortOrder] = useState(
     queryParams.get('sortOrder') || 'asc',
@@ -50,6 +50,7 @@ const PostsManager = () => {
 
   const { limit, skip, setTotal } = usePaginationStore();
   const { posts, setPosts } = usePostsWithUserStore();
+  const { selectedPost, setSelectedPost } = useSelectedPostStore();
 
   const { openUserModal, UserModal } = useUserModal();
   const {
@@ -62,7 +63,7 @@ const PostsManager = () => {
   // URL 업데이트 함수
   const updateURL = () => {
     const params = new URLSearchParams();
-    // if (skip) params.set('skip', skip.toString());
+    if (skip) params.set('skip', skip.toString());
     if (limit) params.set('limit', limit.toString());
     if (searchQuery) params.set('search', searchQuery);
     if (sortBy) params.set('sortBy', sortBy);
@@ -269,6 +270,7 @@ const PostsManager = () => {
     setSelectedPost(post);
     fetchComments(post.id);
     setShowPostDetailDialog(true);
+    setNewComment({ body: '', postId: post.id, userId: post.userId });
   };
 
   useEffect(() => {
@@ -330,7 +332,6 @@ const PostsManager = () => {
                   setSelectedTag={setSelectedTag}
                   openUserModal={openUserModal}
                   openPostDetail={openPostDetail}
-                  setSelectedPost={setSelectedPost}
                   setShowEditDialog={setShowEditDialog}
                   updateURL={updateURL}
                 />
@@ -357,8 +358,6 @@ const PostsManager = () => {
         isOpen={showEditDialog}
         onClose={() => setShowEditDialog(false)}
         onUpdate={updatePost}
-        post={selectedPost}
-        setPost={setSelectedPost}
       />
 
       {/* 게시물 상세 보기 대화상자 */}

@@ -1,3 +1,4 @@
+import { useSelectedPostStore } from '../../../feature/postDetail/model/store';
 import {
   Button,
   Dialog,
@@ -7,23 +8,21 @@ import {
   Input,
   Textarea,
 } from '../../../shared/ui';
-import { Post } from '../model/types';
 
 interface EditPostDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onUpdate: () => void;
-  post: Post | undefined;
-  setPost: (post: Post) => void;
 }
 
 export const EditPostDialog = ({
   isOpen,
   onClose,
   onUpdate,
-  post,
-  setPost,
 }: EditPostDialogProps) => {
+  const { selectedPost: post, setSelectedPost: setPost } =
+    useSelectedPostStore();
+
   if (!post) return null;
 
   return (
