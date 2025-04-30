@@ -8,8 +8,6 @@ import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
-
-import { EditPostDialog } from '../entities/post/ui/EditPostDialog';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
@@ -22,6 +20,7 @@ import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 import useUserModal from '../entities/user/hooks/useUserModal';
 import useEditCommentModal from '../entities/comment/hooks/useEditCommentModal';
 import { useSelectedPostStore } from '../feature/postDetail/model/store';
+import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
 
 const PostsManager = () => {
   const navigate = useNavigate();
@@ -36,7 +35,6 @@ const PostsManager = () => {
   const [sortOrder, setSortOrder] = useState(
     queryParams.get('sortOrder') || 'asc',
   );
-  const [showEditDialog, setShowEditDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [newComment, setNewComment] = useState<CreateCommentRequest>();
@@ -55,6 +53,9 @@ const PostsManager = () => {
     state,
     closeEditCommentModal,
   } = useEditCommentModal();
+
+  const { setIsOpen: setShowEditDialog, UpdatePostModal } =
+    useUpdatePostModal();
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -133,22 +134,6 @@ const PostsManager = () => {
       console.error('태그별 게시물 가져오기 오류:', error);
     }
     setLoading(false);
-  };
-
-  // 게시물 업데이트
-  const updatePost = async () => {
-    try {
-      const response = await fetch(`/api/posts/${selectedPost?.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(selectedPost),
-      });
-      const data = await response.json();
-      setPosts(posts.map((post) => (post.id === data.id ? data : post)));
-      setShowEditDialog(false);
-    } catch (error) {
-      console.error('게시물 업데이트 오류:', error);
-    }
   };
 
   // 댓글 가져오기
@@ -324,11 +309,7 @@ const PostsManager = () => {
       </CardContent>
 
       {/* 게시물 수정 대화상자 */}
-      <EditPostDialog
-        isOpen={showEditDialog}
-        onClose={() => setShowEditDialog(false)}
-        onUpdate={updatePost}
-      />
+      <UpdatePostModal />
 
       {/* 게시물 상세 보기 대화상자 */}
       <PostDetailDialog

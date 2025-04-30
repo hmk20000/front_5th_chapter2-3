@@ -8,11 +8,11 @@ import {
   Input,
   Textarea,
 } from '../../../shared/ui';
-
+import { Post } from '../model/types';
 interface EditPostDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: () => void;
+  onUpdate: (post: Post) => void;
 }
 
 export const EditPostDialog = ({
@@ -43,7 +43,7 @@ export const EditPostDialog = ({
             value={post.body}
             onChange={(e) => setPost({ ...post, body: e.target.value })}
           />
-          <Button onClick={onUpdate}>게시물 업데이트</Button>
+          <Button onClick={() => onUpdate(post)}>게시물 업데이트</Button>
         </div>
       </DialogContent>
     </Dialog>
