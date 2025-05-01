@@ -1,19 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import apiReplace from './plugins/api-replace';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    {
-      name: 'api-replace',
-      transform(code, id) {
-        if (id.includes('api')) {
-          return code.replace(/\/api/g, 'https://dummyjson.com');
-        }
-      },
-    },
-  ],
+  plugins: [react(), apiReplace()],
   base: '/front_5th_chapter2-3',
   build: {
     outDir: 'docs',
