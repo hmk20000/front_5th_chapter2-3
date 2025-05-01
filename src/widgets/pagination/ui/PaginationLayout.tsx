@@ -10,6 +10,7 @@ const PaginationLayout = () => {
   const { total } = usePaginationStore();
   const [filter, updateURL] = useFilter();
   const { skip, limit } = filter;
+
   return (
     <div className="flex justify-between items-center">
       <SelectLimit />
