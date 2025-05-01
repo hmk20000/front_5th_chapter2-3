@@ -24,6 +24,13 @@ const fetchPost = async (params: {
     return response.json();
   }
 
+  if (search) {
+    const response = await fetch(
+      `/api/posts/search?q=${search}&${searchParams.toString()}`,
+    );
+    return response.json();
+  }
+
   const response = await fetch(`/api/posts?${searchParams.toString()}`);
   return response.json();
 };
