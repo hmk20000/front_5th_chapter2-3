@@ -61,3 +61,20 @@ export const DialogTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ),
 );
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
+
+interface DialogDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {
+  className?: string;
+}
+
+export const DialogDescription = forwardRef<
+  HTMLParagraphElement,
+  DialogDescriptionProps
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={`text-sm text-gray-500 ${className}`}
+    {...props}
+  />
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;

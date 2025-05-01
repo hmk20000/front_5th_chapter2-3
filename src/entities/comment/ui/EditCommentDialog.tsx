@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   Textarea,
 } from '../../../shared/ui';
 import { Comment } from '../model/types';
@@ -30,6 +31,9 @@ export const EditCommentDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>댓글 수정</DialogTitle>
+          <DialogDescription>
+            작성한 댓글의 내용을 수정할 수 있습니다.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Textarea

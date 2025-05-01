@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   Textarea,
 } from '../../../shared/ui';
 import { CreateCommentRequest } from '../api/types';
@@ -30,6 +31,9 @@ export const AddCommentDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>새 댓글 추가</DialogTitle>
+          <DialogDescription>
+            게시물에 대한 새로운 댓글을 작성할 수 있습니다.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Textarea

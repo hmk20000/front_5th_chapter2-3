@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   Input,
   Textarea,
 } from '../../../shared/ui';
@@ -30,6 +31,9 @@ export const EditPostDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>게시물 수정</DialogTitle>
+          <DialogDescription>
+            게시물의 제목과 내용을 수정할 수 있습니다.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Input

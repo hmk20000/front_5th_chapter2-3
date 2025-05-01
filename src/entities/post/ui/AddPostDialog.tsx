@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   Input,
   Textarea,
 } from '../../../shared/ui';
@@ -28,6 +29,10 @@ export const AddPostDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>새 게시물 추가</DialogTitle>
+          <DialogDescription>
+            새로운 게시물을 작성할 수 있습니다. 제목, 내용, 작성자 정보를
+            입력해주세요.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Input

@@ -12,7 +12,13 @@ export {
   SelectItem,
   SelectValue,
 } from './Select';
-export { Dialog, DialogContent, DialogHeader, DialogTitle } from './Dialog';
+export {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from './Dialog';
 export {
   Table,
   TableHeader,

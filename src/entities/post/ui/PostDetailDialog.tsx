@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '../../../shared/ui';
 import { Post } from '../model/types';
 import { Comment } from '../../comment/model/types';
@@ -59,6 +60,9 @@ export const PostDetailDialog = ({
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>{highlightText(post.title, searchQuery)}</DialogTitle>
+          <DialogDescription>
+            게시물의 상세 내용과 댓글을 확인할 수 있습니다.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <p>{highlightText(post.body, searchQuery)}</p>
