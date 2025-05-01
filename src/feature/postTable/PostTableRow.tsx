@@ -9,14 +9,12 @@ import { useSelectedPostStore } from '../postDetail/model/store';
 import { useFilter } from '../filter/hooks/useFilter';
 interface PostTableRowProps {
   post: PostWithUser;
-  searchQuery: string;
   openUserModal: (user: User) => void;
   openPostDetail: (post: Post) => void;
   setShowEditDialog: (show: boolean) => void;
 }
 const PostTableRow = ({
   post,
-  searchQuery,
   openUserModal,
   openPostDetail,
   setShowEditDialog,
@@ -48,7 +46,7 @@ const PostTableRow = ({
       <TableCell>{post.id}</TableCell>
       <TableCell>
         <div className="space-y-1">
-          <div>{highlightText(post.title, searchQuery)}</div>
+          <div>{highlightText(post.title, filter.search)}</div>
 
           <div className="flex flex-wrap gap-1">
             {post.tags?.map((tag) => (

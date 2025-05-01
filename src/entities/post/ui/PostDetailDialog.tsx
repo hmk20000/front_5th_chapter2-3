@@ -13,20 +13,17 @@ import { AddCommentDialog } from '../../comment/ui/AddCommentDialog';
 import useEditCommentModal from '../../comment/hooks/useEditCommentModal';
 import { useState } from 'react';
 import { Comment } from '../../comment/model/types';
-
+import { useFilter } from '../../../feature/filter/hooks/useFilter';
+import { useDeleteComment } from '../../comment/hooks/useDeleteComment';
 interface PostDetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  searchQuery: string;
-  onDeleteComment: (id: string) => void;
   onLikeComment: (id: string) => void;
 }
 
 export const PostDetailDialog = ({
   isOpen,
   onClose,
-  searchQuery,
-  onDeleteComment,
   onLikeComment,
 }: PostDetailDialogProps) => {
   // if (!post) return null;
@@ -34,6 +31,8 @@ export const PostDetailDialog = ({
   const { data } = useComment();
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false);
   const { EditCommentModal, openEditCommentModal } = useEditCommentModal();
+  const { mutate: deleteComment } = useDeleteComment();
+  const [filter] = useFilter();
 
   const highlightText = (text: string, highlight: string) => {
     if (!text) return null;
@@ -59,18 +58,24 @@ export const PostDetailDialog = ({
     openEditCommentModal(comment);
   };
 
+  const handleDeleteComment = (comment: Comment) => {
+    deleteComment(comment);
+  };
+
   return (
     post && (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{highlightText(post.title, searchQuery)}</DialogTitle>
+            <DialogTitle>
+              {highlightText(post.title, filter.search)}
+            </DialogTitle>
             <DialogDescription>
               게시물의 상세 내용과 댓글을 확인할 수 있습니다.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <p>{highlightText(post.body, searchQuery)}</p>
+            <p>{highlightText(post.body, filter.search)}</p>
             <div className="mt-2">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-semibold">댓글</h3>
@@ -91,7 +96,7 @@ export const PostDetailDialog = ({
                           {comment.user.username}:
                         </span>
                         <span className="truncate">
-                          {highlightText(comment.body, searchQuery)}
+                          {highlightText(comment.body, filter.search)}
                         </span>
                       </div>
                       <div className="flex items-center space-x-1">
@@ -113,7 +118,7 @@ export const PostDetailDialog = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onDeleteComment(comment.id)}
+                          onClick={() => handleDeleteComment(comment)}
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>

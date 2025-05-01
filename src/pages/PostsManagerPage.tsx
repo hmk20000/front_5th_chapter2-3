@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Card, CardContent } from '../shared/ui';
-import { Post } from '../entities/post/model/types';
 import { Comment } from '../entities/comment/model/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import fetchUsers from '../entities/user/api/fetchUsers';
@@ -15,34 +13,20 @@ import PostTableLayout from '../widgets/table/ui/PostTableLayout';
 import PostTableRow from '../feature/postTable/PostTableRow';
 import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 import useUserModal from '../entities/user/hooks/useUserModal';
-import { useSelectedPostStore } from '../feature/postDetail/model/store';
 import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
-import { useCommentStore } from '../entities/comment/model/store';
 import { Filters, useFilter } from '../feature/filter/hooks/useFilter';
-
+import { useSelectedPostStore } from '../feature/postDetail/model/store';
+import { Post } from '../entities/post/model';
 const PostsManager = () => {
-  // const navigate = useNavigate();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-
   // 상태 관리
-  const [searchQuery, setSearchQuery] = useState(
-    queryParams.get('search') || '',
-  );
-  const [sortBy, setSortBy] = useState(queryParams.get('sortBy') || '');
-  const [sortOrder, setSortOrder] = useState(
-    queryParams.get('sortOrder') || 'asc',
-  );
   const [loading, setLoading] = useState(false);
-  const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
 
   const { setTotal } = usePaginationStore();
   const { posts, setPosts } = usePostsWithUserStore();
-  const { selectedPost, setSelectedPost } = useSelectedPostStore();
-  const { comments, setComments } = useCommentStore();
+
+  const { selectedPost } = useSelectedPostStore();
 
   const { openUserModal, UserModal } = useUserModal();
-
   const { setIsOpen: setShowEditDialog, UpdatePostModal } =
     useUpdatePostModal();
 
@@ -66,23 +50,6 @@ const PostsManager = () => {
         });
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);
-    }
-  };
-
-  // 댓글 삭제
-  const deleteComment = async (id: string, postId: string) => {
-    try {
-      await fetch(`/api/comments/${id}`, {
-        method: 'DELETE',
-      });
-      setComments({
-        ...comments,
-        [postId]: comments[postId].filter(
-          (comment: Comment) => comment.id !== id,
-        ),
-      });
-    } catch (error) {
-      console.error('댓글 삭제 오류:', error);
     }
   };
 
@@ -111,12 +78,6 @@ const PostsManager = () => {
     }
   };
 
-  // 게시물 상세 보기
-  const openPostDetail = (post: Post) => {
-    setSelectedPost(post);
-    setShowPostDetailDialog(true);
-  };
-
   useEffect(() => {
     fetchPosts(filter);
   }, [filter]);
@@ -127,14 +88,7 @@ const PostsManager = () => {
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
-          <FilterLayout
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-          />
+          <FilterLayout />
 
           {/* 게시물 테이블 */}
           {loading ? (
@@ -145,10 +99,11 @@ const PostsManager = () => {
                 <PostTableRow
                   key={post.id}
                   post={post}
-                  searchQuery={searchQuery}
                   openUserModal={openUserModal}
-                  openPostDetail={openPostDetail}
                   setShowEditDialog={setShowEditDialog}
+                  openPostDetail={function (post: Post): void {
+                    throw new Error('Function not implemented.');
+                  }}
                 />
               ))}
             </PostTableLayout>
@@ -164,13 +119,11 @@ const PostsManager = () => {
 
       {/* 게시물 상세 보기 대화상자 */}
       <PostDetailDialog
-        isOpen={showPostDetailDialog}
-        onClose={() => setShowPostDetailDialog(false)}
-        searchQuery={searchQuery}
         onDeleteComment={(id) => deleteComment(id, selectedPost?.id || '')}
         onLikeComment={(id) => likeComment(id, selectedPost?.id || '')}
       />
 
+      {/* 유저 정보 보기 모달 */}
       <UserModal />
     </Card>
   );

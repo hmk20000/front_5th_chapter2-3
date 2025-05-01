@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SelectItem } from '../../../shared/ui/Select';
 import { SelectContent } from '../../../shared/ui/Select';
 import { SelectTrigger } from '../../../shared/ui/Select';
@@ -8,27 +8,13 @@ import { Select } from '../../../shared/ui/Select';
 import { Input } from '../../../shared/ui/Input';
 import { Search } from 'lucide-react';
 import { useFilter } from '../../../feature/filter/hooks/useFilter';
-interface FilterLayoutProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  sortBy: string;
-  setSortBy: (sortBy: string) => void;
-  sortOrder: string;
-  setSortOrder: (sortOrder: string) => void;
-}
 
 /**
  * 검색 및 필터 컨트롤 레이아웃
  */
-const FilterLayout = ({
-  searchQuery,
-  setSearchQuery,
-  sortBy,
-  setSortBy,
-  sortOrder,
-  setSortOrder,
-}: FilterLayoutProps) => {
+const FilterLayout = () => {
   const [filter, updateURL] = useFilter();
+  const [searchQuery, setSearchQuery] = useState(filter.search);
 
   const handleSearchEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -40,6 +26,15 @@ const FilterLayout = ({
   const handleSearch = () => {
     updateURL({ ...filter, search: searchQuery });
   };
+
+  const handleSortByChange = (value: string) => {
+    updateURL({ ...filter, sortBy: value });
+  };
+
+  const handleSortOrderChange = (value: string) => {
+    updateURL({ ...filter, sortOrder: value });
+  };
+
   return (
     <div className="flex gap-4">
       <div className="flex-1">
@@ -56,7 +51,7 @@ const FilterLayout = ({
         </div>
       </div>
       <SelectTags />
-      <Select value={sortBy} onValueChange={setSortBy}>
+      <Select value={filter.sortBy} onValueChange={handleSortByChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 기준" />
         </SelectTrigger>
@@ -67,7 +62,7 @@ const FilterLayout = ({
           <SelectItem value="reactions">반응</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={sortOrder} onValueChange={setSortOrder}>
+      <Select value={filter.sortOrder} onValueChange={handleSortOrderChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 순서" />
         </SelectTrigger>
