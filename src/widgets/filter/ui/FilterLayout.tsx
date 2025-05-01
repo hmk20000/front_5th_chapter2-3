@@ -7,12 +7,10 @@ import SelectTags from '../../../entities/tags/ui/SelectTags';
 import { Select } from '../../../shared/ui/Select';
 import { Input } from '../../../shared/ui/Input';
 import { Search } from 'lucide-react';
-
+import { useFilter } from '../../../feature/filter/hooks/useFilter';
 interface FilterLayoutProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  searchPosts: () => void;
-  handleTagChange: (tag: string) => void;
   sortBy: string;
   setSortBy: (sortBy: string) => void;
   sortOrder: string;
@@ -25,13 +23,23 @@ interface FilterLayoutProps {
 const FilterLayout = ({
   searchQuery,
   setSearchQuery,
-  searchPosts,
-  handleTagChange,
   sortBy,
   setSortBy,
   sortOrder,
   setSortOrder,
 }: FilterLayoutProps) => {
+  const [filter, updateURL] = useFilter();
+
+  const handleSearchEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  const handleSearch = () => {
+    updateURL({ ...filter, search: searchQuery });
+  };
   return (
     <div className="flex gap-4">
       <div className="flex-1">
@@ -42,11 +50,12 @@ const FilterLayout = ({
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && searchPosts()}
+            onKeyDown={handleSearchEvent}
+            onBlur={handleSearch}
           />
         </div>
       </div>
-      <SelectTags onTagChange={handleTagChange} />
+      <SelectTags />
       <Select value={sortBy} onValueChange={setSortBy}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 기준" />

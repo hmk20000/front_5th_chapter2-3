@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Card, CardContent } from '../shared/ui';
 import { Post } from '../entities/post/model/types';
 import { Comment } from '../entities/comment/model/types';
@@ -19,9 +19,10 @@ import useUserModal from '../entities/user/hooks/useUserModal';
 import { useSelectedPostStore } from '../feature/postDetail/model/store';
 import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
 import { useCommentStore } from '../entities/comment/model/store';
+import { Filters, useFilter } from '../feature/filter/hooks/useFilter';
 
 const PostsManager = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
@@ -37,7 +38,7 @@ const PostsManager = () => {
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
-  const { limit, skip, setTotal } = usePaginationStore();
+  const { setTotal } = usePaginationStore();
   const { posts, setPosts } = usePostsWithUserStore();
   const { selectedPost, setSelectedPost } = useSelectedPostStore();
   const { comments, setComments } = useCommentStore();
@@ -47,23 +48,25 @@ const PostsManager = () => {
   const { setIsOpen: setShowEditDialog, UpdatePostModal } =
     useUpdatePostModal();
 
+  const [filter, updateURL] = useFilter();
+
   // URL 업데이트 함수
-  const updateURL = () => {
-    const params = new URLSearchParams();
-    if (skip) params.set('skip', skip.toString());
-    if (limit) params.set('limit', limit.toString());
-    if (searchQuery) params.set('search', searchQuery);
-    if (sortBy) params.set('sortBy', sortBy);
-    if (sortOrder) params.set('sortOrder', sortOrder);
-    if (selectedTag) params.set('tag', selectedTag);
-    navigate(`?${params.toString()}`);
-  };
+  // const updateURL = () => {
+  //   const params = new URLSearchParams();
+  //   if (skip) params.set('skip', skip.toString());
+  //   if (limit) params.set('limit', limit.toString());
+  //   if (searchQuery) params.set('search', searchQuery);
+  //   if (sortBy) params.set('sortBy', sortBy);
+  //   if (sortOrder) params.set('sortOrder', sortOrder);
+  //   if (selectedTag) params.set('tag', selectedTag);
+  //   navigate(`?${params.toString()}`);
+  // };
 
   // 게시물 가져오기
-  const fetchPosts = () => {
+  const fetchPosts = (filter: Filters) => {
     setLoading(true);
     try {
-      Promise.all([fetchPost(limit, skip), fetchUsers()])
+      Promise.all([fetchPost(filter), fetchUsers()])
         .then(([postsData, usersData]) => {
           const postsWithUsers = createPostsWithUsers(
             postsData.posts,
@@ -83,7 +86,7 @@ const PostsManager = () => {
   // 게시물 검색
   const searchPosts = async () => {
     if (!searchQuery) {
-      fetchPosts();
+      fetchPosts(filter);
       return;
     }
     setLoading(true);
@@ -94,34 +97,6 @@ const PostsManager = () => {
       setTotal(data.total);
     } catch (error) {
       console.error('게시물 검색 오류:', error);
-    }
-    setLoading(false);
-  };
-
-  // 태그별 게시물 가져오기
-  const fetchPostsByTag = async (tag: string) => {
-    if (!tag || tag === 'all') {
-      fetchPosts();
-      return;
-    }
-    setLoading(true);
-    try {
-      const [postsResponse, usersResponse] = await Promise.all([
-        fetch(`/api/posts/tag/${tag}`),
-        fetch('/api/users?limit=0&select=username,image'),
-      ]);
-      const postsData = await postsResponse.json();
-      const usersData = await usersResponse.json();
-
-      const postsWithUsers = createPostsWithUsers(
-        postsData.posts,
-        usersData.users,
-      );
-
-      setPosts(postsWithUsers);
-      setTotal(postsData.total);
-    } catch (error) {
-      console.error('태그별 게시물 가져오기 오류:', error);
     }
     setLoading(false);
   };
@@ -175,13 +150,13 @@ const PostsManager = () => {
   };
 
   useEffect(() => {
-    if (selectedTag) {
-      fetchPostsByTag(selectedTag);
-    } else {
-      fetchPosts();
-    }
-    updateURL();
-  }, [skip, limit, sortBy, sortOrder, selectedTag]);
+    // if (selectedTag) {
+    //   fetchPostsByTag(selectedTag);
+    // } else {
+    //   fetchPosts();
+    // }
+    fetchPosts(filter);
+  }, [filter]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -193,11 +168,6 @@ const PostsManager = () => {
     setSelectedTag(params.get('tag') || '');
   }, [location.search]);
 
-  const handleTagChange = (tag: string) => {
-    fetchPostsByTag(tag);
-    updateURL();
-  };
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeaderLayout />
@@ -207,8 +177,6 @@ const PostsManager = () => {
           <FilterLayout
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            searchPosts={searchPosts}
-            handleTagChange={handleTagChange}
             sortBy={sortBy}
             setSortBy={setSortBy}
             sortOrder={sortOrder}
@@ -230,7 +198,6 @@ const PostsManager = () => {
                   openUserModal={openUserModal}
                   openPostDetail={openPostDetail}
                   setShowEditDialog={setShowEditDialog}
-                  updateURL={updateURL}
                 />
               ))}
             </PostTableLayout>

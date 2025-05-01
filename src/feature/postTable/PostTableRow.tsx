@@ -6,6 +6,7 @@ import { Button } from '../../shared/ui/Button';
 import { MessageSquare, ThumbsDown, ThumbsUp, Edit2 } from 'lucide-react';
 import DeletePostButton from '../deletePost/ui/DeletePostButton';
 import { useSelectedPostStore } from '../postDetail/model/store';
+import { useFilter } from '../filter/hooks/useFilter';
 interface PostTableRowProps {
   post: PostWithUser;
   searchQuery: string;
@@ -14,7 +15,6 @@ interface PostTableRowProps {
   openUserModal: (user: User) => void;
   openPostDetail: (post: Post) => void;
   setShowEditDialog: (show: boolean) => void;
-  updateURL: () => void;
 }
 const PostTableRow = ({
   post,
@@ -24,9 +24,9 @@ const PostTableRow = ({
   openUserModal,
   openPostDetail,
   setShowEditDialog,
-  updateURL,
 }: PostTableRowProps) => {
   const { setSelectedPost } = useSelectedPostStore();
+  const [filter, updateURL] = useFilter();
   // 하이라이트 함수 추가
   const highlightText = (text: string, highlight: string) => {
     if (!text) return null;
@@ -65,7 +65,7 @@ const PostTableRow = ({
                 }`}
                 onClick={() => {
                   setSelectedTag(tag);
-                  updateURL();
+                  updateURL({ ...filter, tag });
                 }}
               >
                 {tag}
