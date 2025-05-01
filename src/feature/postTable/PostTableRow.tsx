@@ -5,21 +5,19 @@ import { PostWithUser } from '../postsWithUser/model/types';
 import { Button } from '../../shared/ui/Button';
 import { MessageSquare, ThumbsDown, ThumbsUp, Edit2 } from 'lucide-react';
 import DeletePostButton from '../deletePost/ui/DeletePostButton';
-import { useSelectedPostStore } from '../postDetail/model/store';
 import { useFilter } from '../filter/hooks/useFilter';
 interface PostTableRowProps {
   post: PostWithUser;
   openUserModal: (user: User) => void;
   openPostDetail: (post: Post) => void;
-  setShowEditDialog: (show: boolean) => void;
+  openUpdatePostModal: (post: Post) => void;
 }
 const PostTableRow = ({
   post,
   openUserModal,
   openPostDetail,
-  setShowEditDialog,
+  openUpdatePostModal,
 }: PostTableRowProps) => {
-  const { setSelectedPost } = useSelectedPostStore();
   const [filter, updateURL] = useFilter();
   // 하이라이트 함수 추가
   const highlightText = (text: string, highlight: string) => {
@@ -100,10 +98,7 @@ const PostTableRow = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              setSelectedPost(post);
-              setShowEditDialog(true);
-            }}
+            onClick={() => openUpdatePostModal(post)}
           >
             <Edit2 className="w-4 h-4" />
           </Button>

@@ -8,30 +8,31 @@ import {
 import { Button } from '../../../shared/ui/Button';
 import { Edit2, Plus, ThumbsUp, Trash2 } from 'lucide-react';
 import { useComment } from '../../comment/hooks/useComment';
-import { useSelectedPostStore } from '../../../feature/postDetail/model/store';
 import { AddCommentDialog } from '../../comment/ui/AddCommentDialog';
 import useEditCommentModal from '../../comment/hooks/useEditCommentModal';
 import { useState } from 'react';
 import { Comment } from '../../comment/model/types';
 import { useFilter } from '../../../feature/filter/hooks/useFilter';
 import { useDeleteComment } from '../../comment/hooks/useDeleteComment';
+import { useLikeComment } from '../../comment/hooks/useLikeComment';
+import { Post } from '../model';
 interface PostDetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onLikeComment: (id: string) => void;
+  post: Post | undefined;
 }
 
 export const PostDetailDialog = ({
   isOpen,
   onClose,
-  onLikeComment,
+  post,
 }: PostDetailDialogProps) => {
   // if (!post) return null;
-  const { selectedPost: post } = useSelectedPostStore();
   const { data } = useComment();
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false);
   const { EditCommentModal, openEditCommentModal } = useEditCommentModal();
   const { mutate: deleteComment } = useDeleteComment();
+  const { mutate: likeComment } = useLikeComment();
   const [filter] = useFilter();
 
   const highlightText = (text: string, highlight: string) => {
@@ -60,6 +61,10 @@ export const PostDetailDialog = ({
 
   const handleDeleteComment = (comment: Comment) => {
     deleteComment(comment);
+  };
+
+  const handleLikeComment = (comment: Comment) => {
+    likeComment(comment);
   };
 
   return (
@@ -103,7 +108,7 @@ export const PostDetailDialog = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onLikeComment(comment.id)}
+                          onClick={() => handleLikeComment(comment)}
                         >
                           <ThumbsUp className="w-3 h-3" />
                           <span className="ml-1 text-xs">{comment.likes}</span>

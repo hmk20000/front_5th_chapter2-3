@@ -28,12 +28,18 @@ const useUpdatePostModal = () => {
     );
   };
 
+  const openUpdatePostModal = (post: Post) => {
+    setIsOpen(true);
+    setPost(post);
+  };
+
   return {
     isOpen,
     setIsOpen,
     post,
     setPost,
     UpdatePostModal,
+    openUpdatePostModal,
   };
 };
 

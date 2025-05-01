@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '../shared/ui';
-import { Comment } from '../entities/comment/model/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
-import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
 import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
@@ -15,8 +13,7 @@ import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 import useUserModal from '../entities/user/hooks/useUserModal';
 import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
 import { Filters, useFilter } from '../feature/filter/hooks/useFilter';
-import { useSelectedPostStore } from '../feature/postDetail/model/store';
-import { Post } from '../entities/post/model';
+import usePostDetailModal from '../entities/post/hooks/usePostDetailModal';
 const PostsManager = () => {
   // 상태 관리
   const [loading, setLoading] = useState(false);
@@ -24,11 +21,9 @@ const PostsManager = () => {
   const { setTotal } = usePaginationStore();
   const { posts, setPosts } = usePostsWithUserStore();
 
-  const { selectedPost } = useSelectedPostStore();
-
   const { openUserModal, UserModal } = useUserModal();
-  const { setIsOpen: setShowEditDialog, UpdatePostModal } =
-    useUpdatePostModal();
+  const { openPostDetailModal, PostDetailModal } = usePostDetailModal();
+  const { openUpdatePostModal, UpdatePostModal } = useUpdatePostModal();
 
   const [filter] = useFilter();
 
@@ -50,31 +45,6 @@ const PostsManager = () => {
         });
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);
-    }
-  };
-
-  // 댓글 좋아요
-  const likeComment = async (id: string, postId: string) => {
-    try {
-      const comment = comments[postId]?.find((c) => c.id === id);
-      const response = await fetch(`/api/comments/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          likes: comment ? comment.likes + 1 : 1,
-        }),
-      });
-      const data = await response.json();
-      setComments({
-        ...comments,
-        [postId]: comments[postId].map((comment: Comment) =>
-          comment.id === data.id
-            ? { ...data, likes: comment.likes + 1 }
-            : comment,
-        ),
-      });
-    } catch (error) {
-      console.error('댓글 좋아요 오류:', error);
     }
   };
 
@@ -100,10 +70,8 @@ const PostsManager = () => {
                   key={post.id}
                   post={post}
                   openUserModal={openUserModal}
-                  setShowEditDialog={setShowEditDialog}
-                  openPostDetail={function (post: Post): void {
-                    throw new Error('Function not implemented.');
-                  }}
+                  openPostDetail={openPostDetailModal}
+                  openUpdatePostModal={openUpdatePostModal}
                 />
               ))}
             </PostTableLayout>
@@ -118,10 +86,7 @@ const PostsManager = () => {
       <UpdatePostModal />
 
       {/* 게시물 상세 보기 대화상자 */}
-      <PostDetailDialog
-        onDeleteComment={(id) => deleteComment(id, selectedPost?.id || '')}
-        onLikeComment={(id) => likeComment(id, selectedPost?.id || '')}
-      />
+      <PostDetailModal />
 
       {/* 유저 정보 보기 모달 */}
       <UserModal />
