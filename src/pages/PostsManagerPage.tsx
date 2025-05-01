@@ -3,17 +3,18 @@ import { Card, CardContent } from '../shared/ui';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
-import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
+import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
-import usePaginationStore from '../feature/pagination/model/store';
 import PostTableLayout from '../widgets/table/ui/PostTableLayout';
-import PostTableRow from '../feature/postTable/PostTableRow';
+import usePaginationStore from '../feature/pagination/model/store';
 import usePostsWithUserStore from '../feature/postsWithUser/model/store';
+import PostTableRow from '../feature/postTable/PostTableRow';
 import useUserModal from '../entities/user/hooks/useUserModal';
 import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
-import { Filters, useFilter } from '../feature/filter/hooks/useFilter';
 import usePostDetailModal from '../entities/post/hooks/usePostDetailModal';
+
+import { Filters, useFilter } from '../feature/filter/hooks/useFilter';
 const PostsManager = () => {
   // 상태 관리
   const [loading, setLoading] = useState(false);

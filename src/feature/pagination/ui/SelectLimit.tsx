@@ -3,7 +3,7 @@ import { SelectValue } from '../../../shared/ui/Select';
 import { SelectTrigger } from '../../../shared/ui/Select';
 import { SelectItem } from '../../../shared/ui/Select';
 import { Select } from '../../../shared/ui/Select';
-import usePaginationStore from '../model/store';
+import { useFilter } from '../../filter/hooks/useFilter';
 
 const LIMIT_OPTIONS = [10, 20, 30];
 
@@ -14,13 +14,16 @@ const LIMIT_OPTIONS = [10, 20, 30];
  * @returns
  */
 const SelectLimit = () => {
-  const { limit, setLimit } = usePaginationStore();
+  const [filter, updateURL] = useFilter();
+  const { limit } = filter;
   return (
     <div className="flex items-center gap-2">
       <span>표시</span>
       <Select
         value={limit.toString()}
-        onValueChange={(value) => setLimit(Number(value))}
+        onValueChange={(value) =>
+          updateURL({ ...filter, limit: Number(value) })
+        }
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="10" />
