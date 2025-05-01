@@ -45,12 +45,12 @@ export const UserModal = ({ isOpen, onClose, userDetail }: UserModalProps) => {
               <strong>전화번호:</strong> {userDetail.phone}
             </p>
             <p>
-              <strong>주소:</strong> {userDetail.address.address},{' '}
-              {userDetail.address.city}, {userDetail.address.state}
+              <strong>주소:</strong> {userDetail.address?.address},{' '}
+              {userDetail.address?.city}, {userDetail.address?.state}
             </p>
             <p>
-              <strong>직장:</strong> {userDetail.company.name} -{' '}
-              {userDetail.company.title}
+              <strong>직장:</strong> {userDetail.company?.name} -{' '}
+              {userDetail.company?.title}
             </p>
           </div>
         </div>
