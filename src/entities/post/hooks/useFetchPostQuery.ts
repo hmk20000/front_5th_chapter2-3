@@ -7,7 +7,7 @@ export const useFetchPostQuery = (params?: {
   skip?: number;
   search?: string;
   sortBy?: string;
-  sortOrder?: string;
+  order?: string;
   tag?: string;
 }) => {
   return useQuery<FetchPostsResponse>({

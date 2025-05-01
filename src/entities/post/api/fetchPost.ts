@@ -5,17 +5,17 @@ const fetchPost = async (params: {
   skip?: number;
   search?: string;
   sortBy?: string;
-  sortOrder?: string;
+  order?: string;
   tag?: string;
 }): Promise<FetchPostsResponse> => {
-  const { limit, skip, search, sortBy, sortOrder, tag } = params;
+  const { limit, skip, search, sortBy, order, tag } = params;
   const searchParams = new URLSearchParams();
 
   if (limit) searchParams.set('limit', limit.toString());
   if (skip) searchParams.set('skip', skip.toString());
   if (search) searchParams.set('search', search);
   if (sortBy) searchParams.set('sortBy', sortBy);
-  if (sortOrder) searchParams.set('sortOrder', sortOrder);
+  if (order) searchParams.set('order', order);
 
   if (tag) {
     const response = await fetch(
