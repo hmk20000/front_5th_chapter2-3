@@ -141,7 +141,21 @@ describe('PostsManager', () => {
   // 다른 테스트 케이스들. 참고용으로 작성된 것이며, 실제로는 작성하지 않았습니다.
   it('태그 필터링이 올바르게 작동해야 합니다');
   it('정렬 기능이 올바르게 작동해야 합니다');
-  it('페이지네이션이 올바르게 작동해야 합니다');
+  it('페이지네이션이 올바르게 작동해야 합니다', async () => {
+    const user = userEvent.setup();
+    renderPostsManager();
+
+    // 이전 버튼 빌활성 확인
+    const prevButton = screen.getByRole('button', { name: /이전/i });
+    expect(prevButton).toBeDisabled();
+
+    // 다음 버튼 클릭
+    const nextButton = screen.getByRole('button', { name: /다음/i });
+    await user.click(nextButton);
+
+    // 이전 버튼 활성화 확인
+    expect(prevButton).toBeEnabled();
+  });
   it('게시물 상세 보기 대화상자가 올바르게 열리고 내용을 표시해야 합니다');
   it('댓글 추가 기능이 올바르게 작동해야 합니다');
   it('댓글 수정 기능이 올바르게 작동해야 합니다');
