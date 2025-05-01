@@ -1,41 +1,33 @@
 import { useState } from 'react';
-import { User, UserDetail } from '../model/types';
+import { User } from '../model/types';
 import { UserModal as UserModalComponent } from '../ui/UserModal';
-import fetchUser from '../api/fetchUser';
+import { useUserQuery } from './useUserQuery';
 
 type UserModalState = {
   isOpen: boolean;
-  user: UserDetail | undefined;
-  isLoading: boolean;
+  userId: string | undefined;
 };
 
 const useUserModal = () => {
   const [state, setState] = useState<UserModalState>({
     isOpen: false,
-    user: undefined,
-    isLoading: false,
+    userId: undefined,
   });
 
+  const { data: user } = useUserQuery(state.userId || '');
+
   const openUserModal = (user: User) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
-    fetchUser(user.id)
-      .then((user) => {
-        setState((prev) => ({ ...prev, isOpen: true, user, isLoading: false }));
-      })
-      .catch((error) => {
-        console.error('사용자 정보 가져오기 오류:', error);
-        setState((prev) => ({ ...prev, isLoading: false }));
-      });
+    setState({ isOpen: true, userId: user.id.toString() });
   };
 
   const resetState = () =>
-    setState((prev) => ({ ...prev, isOpen: false, user: undefined }));
+    setState((prev) => ({ ...prev, isOpen: false, userId: undefined }));
 
   const UserModal = () => {
     return (
       <UserModalComponent
         isOpen={state.isOpen}
-        userDetail={state.user}
+        userDetail={user}
         onClose={resetState}
       />
     );
