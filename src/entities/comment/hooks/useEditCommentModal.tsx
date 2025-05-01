@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Comment } from '../model/types';
 import { EditCommentDialog } from '../ui/EditCommentDialog';
+import { useUpdateComment } from './useUpdateComment';
 
 type EditCommentModalState = {
   isOpen: boolean;
@@ -14,6 +15,7 @@ const useEditCommentModal = () => {
     comment: undefined,
     isLoading: false,
   });
+  const { mutateAsync: updateComment } = useUpdateComment();
 
   const openEditCommentModal = (comment: Comment) => {
     setState((prev) => ({ ...prev, isOpen: true, comment }));
@@ -23,11 +25,13 @@ const useEditCommentModal = () => {
     setState((prev) => ({ ...prev, isOpen: false, comment: undefined }));
   };
 
-  const EditCommentModal = ({
-    onUpdate,
-  }: {
-    onUpdate: (comment: Comment) => Promise<void>;
-  }) => {
+  const onUpdate = async (comment: Comment) => {
+    // 리액트쿼리 뮤태이트로 낙관적 업데이트 처리
+    await updateComment(comment);
+    closeEditCommentModal();
+  };
+
+  const EditCommentModal = () => {
     return (
       <EditCommentDialog
         isOpen={state.isOpen}

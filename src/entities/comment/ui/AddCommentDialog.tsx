@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -8,23 +9,55 @@ import {
   Textarea,
 } from '../../../shared/ui';
 import { CreateCommentRequest } from '../api/types';
-
+import { useCommentStore } from '../model/store';
+import { useSelectedPostStore } from '../../../feature/postDetail/model/store';
 interface AddCommentDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: () => void;
-  comment: CreateCommentRequest | undefined;
-  setComment: (comment: CreateCommentRequest) => void;
 }
 
 export const AddCommentDialog = ({
   isOpen,
   onClose,
-  onAdd,
-  comment,
-  setComment,
 }: AddCommentDialogProps) => {
-  if (!comment) return null;
+  const { comments, setComments } = useCommentStore();
+  const { selectedPost } = useSelectedPostStore();
+
+  const [comment, setComment] = useState<CreateCommentRequest>({
+    body: '',
+    postId: selectedPost?.id || null,
+    userId: selectedPost?.userId || 1,
+  });
+
+  useEffect(() => {
+    if (selectedPost) {
+      setComment({
+        ...comment,
+        postId: selectedPost.id,
+        userId: selectedPost.userId,
+      });
+    }
+  }, [selectedPost]);
+
+  // 댓글 추가
+  const addComment = async () => {
+    try {
+      const response = await fetch('/api/comments/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(comment),
+      });
+      const data = await response.json();
+      setComments({
+        ...comments,
+        [data.postId]: [...(comments[data.postId] || []), data],
+      });
+      onClose();
+      setComment({ body: '', postId: null, userId: 1 });
+    } catch (error) {
+      console.error('댓글 추가 오류:', error);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -38,10 +71,10 @@ export const AddCommentDialog = ({
         <div className="space-y-4">
           <Textarea
             placeholder="댓글 내용"
-            value={comment.body || ''}
+            value={comment?.body || ''}
             onChange={(e) => setComment({ ...comment, body: e.target.value })}
           />
-          <Button onClick={onAdd}>댓글 추가</Button>
+          <Button onClick={addComment}>댓글 추가</Button>
         </div>
       </DialogContent>
     </Dialog>
