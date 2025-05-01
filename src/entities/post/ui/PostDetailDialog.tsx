@@ -127,6 +127,7 @@ export const PostDetailDialog = ({
           <AddCommentDialog
             isOpen={showAddCommentDialog}
             onClose={() => setShowAddCommentDialog(false)}
+            post={post}
           />
 
           {/* 댓글 수정 대화상자 */}

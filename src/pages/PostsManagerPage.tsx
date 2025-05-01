@@ -8,7 +8,6 @@ import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
 import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
-import { AddCommentDialog } from '../entities/comment/ui/AddCommentDialog';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
 import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
@@ -17,7 +16,6 @@ import PostTableLayout from '../widgets/table/ui/PostTableLayout';
 import PostTableRow from '../feature/postTable/PostTableRow';
 import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 import useUserModal from '../entities/user/hooks/useUserModal';
-import useEditCommentModal from '../entities/comment/hooks/useEditCommentModal';
 import { useSelectedPostStore } from '../feature/postDetail/model/store';
 import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
 import { useCommentStore } from '../entities/comment/model/store';
@@ -36,7 +34,6 @@ const PostsManager = () => {
     queryParams.get('sortOrder') || 'asc',
   );
   const [loading, setLoading] = useState(false);
-  const [showAddCommentDialog, setShowAddCommentDialog] = useState(false);
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
   const { selectedTag, setSelectedTag } = useSelectedTags();
 
@@ -46,12 +43,6 @@ const PostsManager = () => {
   const { comments, setComments } = useCommentStore();
 
   const { openUserModal, UserModal } = useUserModal();
-  const {
-    openEditCommentModal,
-    EditCommentModal,
-    state,
-    closeEditCommentModal,
-  } = useEditCommentModal();
 
   const { setIsOpen: setShowEditDialog, UpdatePostModal } =
     useUpdatePostModal();
@@ -72,20 +63,20 @@ const PostsManager = () => {
   const fetchPosts = () => {
     setLoading(true);
     try {
-      Promise.all([fetchPost(limit, skip), fetchUsers()]).then(
-        ([postsData, usersData]) => {
+      Promise.all([fetchPost(limit, skip), fetchUsers()])
+        .then(([postsData, usersData]) => {
           const postsWithUsers = createPostsWithUsers(
             postsData.posts,
             usersData.users,
           );
           setPosts(postsWithUsers);
           setTotal(postsData.total);
-        },
-      );
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -133,39 +124,6 @@ const PostsManager = () => {
       console.error('태그별 게시물 가져오기 오류:', error);
     }
     setLoading(false);
-  };
-
-  // 댓글 가져오기
-  // const fetchComments = async (postId: string) => {
-  //   if (comments[postId]) return; // 이미 불러온 댓글이 있으면 다시 불러오지 않음
-  //   try {
-  //     const response = await fetch(`/api/comments/post/${postId}`);
-  //     const data = await response.json();
-
-  //   } catch (error) {
-  //     console.error('댓글 가져오기 오류:', error);
-  //   }
-  // };
-
-  // 댓글 업데이트
-  const updateComment = async () => {
-    try {
-      const response = await fetch(`/api/comments/${state.comment?.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: state.comment?.body }),
-      });
-      const data = await response.json();
-      setComments({
-        ...comments,
-        [data.postId]: comments[data.postId].map((comment: Comment) =>
-          comment.id === data.id ? data : comment,
-        ),
-      });
-      closeEditCommentModal();
-    } catch (error) {
-      console.error('댓글 업데이트 오류:', error);
-    }
   };
 
   // 댓글 삭제
@@ -240,10 +198,6 @@ const PostsManager = () => {
     updateURL();
   };
 
-  const handleEditComment = (comment: Comment) => {
-    openEditCommentModal(comment);
-  };
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeaderLayout />
@@ -295,20 +249,9 @@ const PostsManager = () => {
         isOpen={showPostDetailDialog}
         onClose={() => setShowPostDetailDialog(false)}
         searchQuery={searchQuery}
-        onAddComment={() => setShowAddCommentDialog(true)}
-        onEditComment={handleEditComment}
         onDeleteComment={(id) => deleteComment(id, selectedPost?.id || '')}
         onLikeComment={(id) => likeComment(id, selectedPost?.id || '')}
       />
-
-      {/* 댓글 추가 대화상자 */}
-      <AddCommentDialog
-        isOpen={showAddCommentDialog}
-        onClose={() => setShowAddCommentDialog(false)}
-      />
-
-      {/* 댓글 수정 대화상자 */}
-      <EditCommentModal onUpdate={updateComment} />
 
       <UserModal />
     </Card>

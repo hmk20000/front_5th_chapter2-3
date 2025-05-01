@@ -35,10 +35,10 @@ export const useUpdateComment = () => {
         context?.previousComments,
       );
     },
-    onSettled: () => {
-      // 댓글 목록 캐시 무효화
-      // Mock API 특성상 무효화 하지 않음. => 실 데이터가 변경되지 않기때문에 리셋됨.
-      // queryClient.invalidateQueries({ queryKey: ['comments'] });
-    },
+    // Mock API 특성상 무효화 하지 않음. => 실 데이터가 변경되지 않기때문에 리셋됨.
+    // onSettled: () => {
+    //   // 댓글 목록 캐시 무효화
+    //   // queryClient.invalidateQueries({ queryKey: ['comments'] });
+    // },
   });
 };
