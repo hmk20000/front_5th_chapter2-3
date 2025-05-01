@@ -7,7 +7,7 @@ import {
 } from '../../../shared/ui';
 import { Button } from '../../../shared/ui/Button';
 import { Edit2, Plus, ThumbsUp, Trash2 } from 'lucide-react';
-import { useComment } from '../../comment/hooks/useComment';
+import { useFetchCommentQuery } from '../../comment/hooks/useFetchCommentQuery';
 import { AddCommentDialog } from '../../comment/ui/AddCommentDialog';
 import useEditCommentModal from '../../comment/hooks/useEditCommentModal';
 import { useState } from 'react';
@@ -27,8 +27,7 @@ export const PostDetailDialog = ({
   onClose,
   post,
 }: PostDetailDialogProps) => {
-  // if (!post) return null;
-  const { data } = useComment();
+  const { data } = useFetchCommentQuery(post?.id || '');
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false);
   const { EditCommentModal, openEditCommentModal } = useEditCommentModal();
   const { mutate: deleteComment } = useDeleteComment();
