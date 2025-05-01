@@ -1,57 +1,20 @@
-import { useEffect, useState } from 'react';
 import { Card, CardContent } from '../shared/ui';
-import { createPostsWithUsers } from '../feature/postsWithUser/lib';
-import fetchUsers from '../entities/user/api/fetchUsers';
-import fetchPost from '../entities/post/api/fetchPost';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import PaginationLayout from '../widgets/pagination/ui/PaginationLayout';
 import PostTableLayout from '../widgets/table/ui/PostTableLayout';
-import usePaginationStore from '../feature/pagination/model/store';
-import usePostsWithUserStore from '../feature/postsWithUser/model/store';
 import PostTableRow from '../feature/postTable/PostTableRow';
 import useUserModal from '../entities/user/hooks/useUserModal';
 import useUpdatePostModal from '../entities/post/hooks/useUpdatePostModal';
 import usePostDetailModal from '../entities/post/hooks/usePostDetailModal';
+import usePostWithUser from '../feature/postsWithUser/hooks/usePostWithUser';
 
-import { Filters, useFilter } from '../feature/filter/hooks/useFilter';
 const PostsManager = () => {
-  // 상태 관리
-  const [loading, setLoading] = useState(false);
-
-  const { setTotal } = usePaginationStore();
-  const { posts, setPosts } = usePostsWithUserStore();
-
   const { openUserModal, UserModal } = useUserModal();
   const { openPostDetailModal, PostDetailModal } = usePostDetailModal();
   const { openUpdatePostModal, UpdatePostModal } = useUpdatePostModal();
 
-  const [filter] = useFilter();
-
-  // 게시물 가져오기
-  const fetchPosts = (filter: Filters) => {
-    setLoading(true);
-    try {
-      Promise.all([fetchPost(filter), fetchUsers()])
-        .then(([postsData, usersData]) => {
-          const postsWithUsers = createPostsWithUsers(
-            postsData.posts,
-            usersData.users,
-          );
-          setPosts(postsWithUsers);
-          setTotal(postsData.total);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } catch (error) {
-      console.error('게시물 가져오기 오류:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchPosts(filter);
-  }, [filter]);
+  const { postsWithUsers: posts, isLoading: loading } = usePostWithUser();
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
@@ -83,14 +46,14 @@ const PostsManager = () => {
         </div>
       </CardContent>
 
-      {/* 게시물 수정 대화상자 */}
-      <UpdatePostModal />
+      {/* 유저 정보 보기 모달 */}
+      <UserModal />
 
       {/* 게시물 상세 보기 대화상자 */}
       <PostDetailModal />
 
-      {/* 유저 정보 보기 모달 */}
-      <UserModal />
+      {/* 게시물 수정 대화상자 */}
+      <UpdatePostModal />
     </Card>
   );
 };

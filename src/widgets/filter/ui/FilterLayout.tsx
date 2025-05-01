@@ -31,8 +31,8 @@ const FilterLayout = () => {
     updateURL({ ...filter, sortBy: value });
   };
 
-  const handleSortOrderChange = (value: string) => {
-    updateURL({ ...filter, sortOrder: value });
+  const handleOrderChange = (value: string) => {
+    updateURL({ ...filter, order: value });
   };
 
   return (
@@ -62,7 +62,7 @@ const FilterLayout = () => {
           <SelectItem value="reactions">반응</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={filter.sortOrder} onValueChange={handleSortOrderChange}>
+      <Select value={filter.order} onValueChange={handleOrderChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 순서" />
         </SelectTrigger>

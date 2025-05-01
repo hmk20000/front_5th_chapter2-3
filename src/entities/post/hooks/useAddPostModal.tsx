@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { AddPostDialog } from '../ui/AddPostDialog';
-import addPost from '../api/addPost';
 import { PostDTO } from '../model/types';
-import usePostsWithUserStore from '../../../feature/postsWithUser/model/store';
+import { useAddPostQuery } from './useAddPostQuery';
 
 const useAddPostModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { posts, setPosts } = usePostsWithUserStore();
+  const { mutate: addPost } = useAddPostQuery();
 
   const AddPostModal = () => {
     const [newPost, setNewPost] = useState<PostDTO>({
@@ -16,14 +15,11 @@ const useAddPostModal = () => {
     });
 
     const handleAddPost = () => {
-      addPost(newPost)
-        .then((response) => {
-          console.log(response);
-          setPosts([response, ...posts]);
-        })
-        .finally(() => {
+      addPost(newPost, {
+        onSettled: () => {
           setIsOpen(false);
-        });
+        },
+      });
     };
 
     return (

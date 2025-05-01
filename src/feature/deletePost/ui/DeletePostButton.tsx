@@ -1,13 +1,10 @@
 import { Button } from '../../../shared/ui/Button';
 import { Trash2 } from 'lucide-react';
-import deletePost from '../api/deletePost';
-import usePostsWithUserStore from '../../postsWithUser/model/store';
+import { useDeletePostQuery } from '../hooks/useDeletePostQuery';
 const DeletePostButton = ({ postId }: { postId: string }) => {
-  const { posts, setPosts } = usePostsWithUserStore();
+  const { mutate: deletePost } = useDeletePostQuery();
   const handleDelete = (postId: string) => {
-    deletePost(postId).then(() => {
-      setPosts(posts.filter((post) => post.id !== postId));
-    });
+    deletePost(postId);
   };
   return (
     <Button variant="ghost" size="sm" onClick={() => handleDelete(postId)}>
