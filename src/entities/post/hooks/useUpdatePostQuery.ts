@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updatePost } from '../api/updatePost';
 import { Post } from '../model/types';
-import { PostWithUser } from '../../../feature/postsWithUser/model/types';
+import { FetchPostsResponse } from '../api/types';
 
 export const useUpdatePostQuery = () => {
   const queryClient = useQueryClient();
@@ -10,27 +10,36 @@ export const useUpdatePostQuery = () => {
     onMutate: async (updatedPost: Post) => {
       // 기존 쿼리 취소
       await queryClient.cancelQueries({
-        queryKey: ['posts'],
+        predicate: (query) => query.queryKey[0] === 'posts',
       });
 
       // 이전 데이터 저장
-      const previousPosts = queryClient.getQueryData<PostWithUser[]>(['posts']);
-
-      // 낙관적 업데이트
-      queryClient.setQueryData<PostWithUser[]>(['posts'], (old) => {
-        if (!old) return [];
-
-        return old.map((post) =>
-          post.id === updatedPost.id ? { ...post, ...updatedPost } : post,
-        );
+      const previousQueries = queryClient.getQueriesData<FetchPostsResponse>({
+        predicate: (query) => query.queryKey[0] === 'posts',
       });
 
-      return { previousPosts };
+      // 낙관적 업데이트
+      queryClient.setQueriesData<FetchPostsResponse>(
+        { predicate: (query) => query.queryKey[0] === 'posts' },
+        (old) => {
+          if (!old) return { posts: [], total: 0, skip: 0, limit: 0 };
+          return {
+            ...old,
+            posts: old.posts.map((post) =>
+              post.id === updatedPost.id ? { ...post, ...updatedPost } : post,
+            ),
+          };
+        },
+      );
+
+      return { previousQueries };
     },
     onError: (_, __, context) => {
       // 에러 발생 시 이전 상태로 롤백
-      if (context?.previousPosts) {
-        queryClient.setQueryData(['posts'], context.previousPosts);
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
       }
     },
     // Mock API 특성상 무효화 하지 않음. => 실 데이터가 변경되지 않기때문에 리셋됨.
