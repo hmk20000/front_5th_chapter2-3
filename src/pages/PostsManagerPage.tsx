@@ -6,7 +6,6 @@ import { Comment } from '../entities/comment/model/types';
 import { createPostsWithUsers } from '../feature/postsWithUser/lib';
 import fetchUsers from '../entities/user/api/fetchUsers';
 import fetchPost from '../entities/post/api/fetchPost';
-import useSelectedTags from '../feature/selectTags/hooks/useSelectedTags';
 import { PostDetailDialog } from '../entities/post/ui/PostDetailDialog';
 import CardHeaderLayout from '../widgets/card/ui/CardHeaderLayout';
 import FilterLayout from '../widgets/filter/ui/FilterLayout';
@@ -36,7 +35,6 @@ const PostsManager = () => {
   );
   const [loading, setLoading] = useState(false);
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
-  const { selectedTag, setSelectedTag } = useSelectedTags();
 
   const { setTotal } = usePaginationStore();
   const { posts, setPosts } = usePostsWithUserStore();
@@ -48,19 +46,7 @@ const PostsManager = () => {
   const { setIsOpen: setShowEditDialog, UpdatePostModal } =
     useUpdatePostModal();
 
-  const [filter, updateURL] = useFilter();
-
-  // URL 업데이트 함수
-  // const updateURL = () => {
-  //   const params = new URLSearchParams();
-  //   if (skip) params.set('skip', skip.toString());
-  //   if (limit) params.set('limit', limit.toString());
-  //   if (searchQuery) params.set('search', searchQuery);
-  //   if (sortBy) params.set('sortBy', sortBy);
-  //   if (sortOrder) params.set('sortOrder', sortOrder);
-  //   if (selectedTag) params.set('tag', selectedTag);
-  //   navigate(`?${params.toString()}`);
-  // };
+  const [filter] = useFilter();
 
   // 게시물 가져오기
   const fetchPosts = (filter: Filters) => {
@@ -81,24 +67,6 @@ const PostsManager = () => {
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);
     }
-  };
-
-  // 게시물 검색
-  const searchPosts = async () => {
-    if (!searchQuery) {
-      fetchPosts(filter);
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/posts/search?q=${searchQuery}`);
-      const data = await response.json();
-      setPosts(data.posts);
-      setTotal(data.total);
-    } catch (error) {
-      console.error('게시물 검색 오류:', error);
-    }
-    setLoading(false);
   };
 
   // 댓글 삭제
@@ -150,23 +118,8 @@ const PostsManager = () => {
   };
 
   useEffect(() => {
-    // if (selectedTag) {
-    //   fetchPostsByTag(selectedTag);
-    // } else {
-    //   fetchPosts();
-    // }
     fetchPosts(filter);
   }, [filter]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    // setSkip(parseInt(params.get('skip') || '0'));
-    // setLimit(parseInt(params.get('limit') || '10'));
-    setSearchQuery(params.get('search') || '');
-    setSortBy(params.get('sortBy') || '');
-    setSortOrder(params.get('sortOrder') || 'asc');
-    setSelectedTag(params.get('tag') || '');
-  }, [location.search]);
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
@@ -193,8 +146,6 @@ const PostsManager = () => {
                   key={post.id}
                   post={post}
                   searchQuery={searchQuery}
-                  selectedTag={selectedTag}
-                  setSelectedTag={setSelectedTag}
                   openUserModal={openUserModal}
                   openPostDetail={openPostDetail}
                   setShowEditDialog={setShowEditDialog}

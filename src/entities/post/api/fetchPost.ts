@@ -16,7 +16,14 @@ const fetchPost = async (params: {
   if (search) searchParams.set('search', search);
   if (sortBy) searchParams.set('sortBy', sortBy);
   if (sortOrder) searchParams.set('sortOrder', sortOrder);
-  if (tag) searchParams.set('tag', tag);
+
+  if (tag) {
+    const response = await fetch(
+      `/api/posts/tag/${tag}?${searchParams.toString()}`,
+    );
+    return response.json();
+  }
+
   const response = await fetch(`/api/posts?${searchParams.toString()}`);
   return response.json();
 };

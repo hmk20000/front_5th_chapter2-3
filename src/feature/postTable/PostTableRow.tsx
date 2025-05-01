@@ -10,8 +10,6 @@ import { useFilter } from '../filter/hooks/useFilter';
 interface PostTableRowProps {
   post: PostWithUser;
   searchQuery: string;
-  selectedTag: string;
-  setSelectedTag: (tag: string) => void;
   openUserModal: (user: User) => void;
   openPostDetail: (post: Post) => void;
   setShowEditDialog: (show: boolean) => void;
@@ -19,8 +17,6 @@ interface PostTableRowProps {
 const PostTableRow = ({
   post,
   searchQuery,
-  selectedTag,
-  setSelectedTag,
   openUserModal,
   openPostDetail,
   setShowEditDialog,
@@ -59,12 +55,11 @@ const PostTableRow = ({
               <span
                 key={tag}
                 className={`px-1 text-[9px] font-semibold rounded-[4px] cursor-pointer ${
-                  selectedTag === tag
+                  filter.tag === tag
                     ? 'text-white bg-blue-500 hover:bg-blue-600'
                     : 'text-blue-800 bg-blue-100 hover:bg-blue-200'
                 }`}
                 onClick={() => {
-                  setSelectedTag(tag);
                   updateURL({ ...filter, tag });
                 }}
               >

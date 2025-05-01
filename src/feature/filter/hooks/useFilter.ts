@@ -42,7 +42,13 @@ export const useFilter = () => {
     if (updated.sortOrder) params.set('sortOrder', updated.sortOrder);
     if (updated.limit) params.set('limit', updated.limit.toString());
     if (updated.skip) params.set('skip', updated.skip.toString());
-    if (updated.tag) params.set('tag', updated.tag);
+    if (updated.tag) {
+      if (updated.tag === 'all') {
+        params.delete('tag');
+      } else {
+        params.set('tag', updated.tag);
+      }
+    }
 
     setSearchParams(params);
   };
